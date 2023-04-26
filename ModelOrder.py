@@ -22,8 +22,8 @@ class ModelOrder:
 
     #Function to get an order
     def CheckOrder(self):
-        if self.send:   #En caso de que se haya pulsado el intro, se resetean los valores y se devuelve la orden
-            self.send = False
-            Order = self.text
-            self.text = ''
-            return  Order
+        #Se resetean los valores y se devuelve la orden
+        self.send = False
+        Order = self.text
+        self.text = ''
+        return  Order
