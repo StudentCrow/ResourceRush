@@ -10,7 +10,7 @@ class ModelOrder:
         self.send = False
 
     #Function to write the orders
-    def GetOrder(self, event):
+    def GetOrder(self, event):  #Shall transform all inserted characters to capital letters
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:    #Si el evento es que se ha pulsado una tecla
                 if event.key == pygame.K_RETURN:    #Si se pulsa el intro
