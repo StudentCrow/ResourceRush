@@ -36,6 +36,6 @@ class ModelBit:
                 pass
             case 5:
                 pass
-            case _: #May have to change it into a an exception raise link
+            case _: #May have to change it into an error raise link
                 print('THE GIVEN ORDER IS NOT VALID')
                 return ''   #We force the ending of the method
