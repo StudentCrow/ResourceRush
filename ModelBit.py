@@ -1,9 +1,19 @@
 import pygame
 import ModelOrder
+import ModelLocation
 
 class InvalidOrderError(Exception):
     """
     Custom error that gets executed when the given order to the bit is not valid
+    """
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
+
+class InvalidLocationError(Exception):
+    """
+    Custom error that gets executed when the given location to the bit is not valid
     """
     def __init__(self, message):
         self.message = message
@@ -30,6 +40,9 @@ class ModelBit:
         #    FIX LOCATION, 2
         #    GET RESOURCE FROM LOCATION, 4
         #    STORE RESOURCE TO LOCATION, 4
+
+        # List of the valid locations
+        self.LocationList = ['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
 
     #Function that checks if an order is real and calls for the correct method
     def ReceiveOrder(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
@@ -79,3 +92,12 @@ class ModelBit:
                             raise InvalidOrderError('INVALID ORDER')
             case _: #Raises custom error
                 raise InvalidOrderError('INVALID ORDER')
+
+    def goto(self, destination): #Method that moves a bit to a designated location
+        if destination not in self.LocationList:    #In case the given location is not found in the available list, raise the custom error
+            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+        else:
+            if self.loc == destination: #If the bit is already at the given location, do nothing
+                return ''
+            else:
+                pass
