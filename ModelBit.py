@@ -1,6 +1,15 @@
 import pygame
 import ModelOrder
 
+class InvalidOrderError(Exception):
+    """
+    Custom error that gets executed when the given order to the bit is not valid
+    """
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
+
 class ModelBit:
     """
     Model part class that controls each individual bit
@@ -36,6 +45,5 @@ class ModelBit:
                 pass
             case 5:
                 pass
-            case _: #May have to change it into an error raise link
-                print('THE GIVEN ORDER IS NOT VALID')
-                return ''   #We force the ending of the method
+            case _: #Raises custom error
+                raise InvalidOrderError('Invalid order')
