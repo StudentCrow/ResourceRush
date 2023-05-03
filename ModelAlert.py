@@ -1,4 +1,5 @@
 import pygame
 
 class ModelALert:
-    pass
+    def __init__(self, name):
+        self.AlertType = name

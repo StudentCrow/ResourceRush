@@ -12,4 +12,8 @@ class ModelLocation:
         self.AlertNum = AlertNum
         self.x = x
         self.y = y
-        #self.AlertList = , still to determine the type of alerts a location can have
+        self.AlertNames = ['Alert1', 'Alert2', 'Alert3']
+        self.AlertList = []
+
+    def GenerateAlert(self):
+        pass
