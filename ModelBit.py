@@ -24,12 +24,18 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, time = 0.0, working = False, subsystem = False, critic = False):
+    def __init__(self, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, go_to = False):
+        #self.image = pygame.image.load(img_path)    #Load sprite
+
         self.time = time    #Determines the remining lifetime of the bit
         self.working = working  #Boolean that indicates if the bit is currently working or in standby
         self.subsystem = subsystem  #Boolean that indicates if the bit is working in a subsystem or not
         self.critic = critic    #Boolean that indicates if the bit is in critic state or not
         self.loc = 'BIOS'   #Location where the bit is currently positionated
+        self.x = x
+        self.y = y
+
+        self.go_to = go_to
 
         # List of hints of the orders a bit can get
         self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET', 'STORE', 'MOVE']
@@ -42,7 +48,17 @@ class ModelBit:
         #    STORE RESOURCE TO LOCATION, 4
 
         # List of the valid locations
-        self.LocationList = ['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
+        # It will have to be the list obtained with the determined objects of ModelLocation
+        # For now it will remain as it is, here is the code example for the LocationList made in main code:
+        # Locations = [ModelLocation('PERI'), ModelLocation('VRM'), ModelLocation('RAM'),
+        #            ModelLocation('ATX'), ModelLocation('CPU'), ModelLocation('DISK'),
+        #            ModelLocation('CLK'), ModelLocation('BIOS'), ModelLocation('CHIPSET'),
+        #            ModelLocation('GPU'), ModelLocation('VENT')]
+        # LocList = []
+        # for location in Locations:
+        #    LocList.append(location.name)
+        self.LocationList = locations
+        #['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
 
     #Function that checks if an order is real and calls for the correct method
     def ReceiveOrder(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
@@ -68,7 +84,17 @@ class ModelBit:
                     if self.OrdList.index(i) == 2:
                         reference = i.split()
                         if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
-                            pass    #Start goto method
+                            destination = DecomposedOrd[2]
+                            if destination not in self.LocationList.name:  # In case the given location is not found in the available list, raise the custom error
+                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                            else:
+                                if self.loc == destination:  # If the bit is already at the given location, do nothing
+                                    return ''
+                                else:
+                                    for location in self.LocationList:  # Get the coordinates from the new location
+                                        if location.name == destination:
+                                            self.loc = destination
+                                            self.go_to = True
                         else:
                             raise InvalidOrderError('INVALID ORDER')
             case 4: #Case when the order is get or store
@@ -94,10 +120,8 @@ class ModelBit:
                 raise InvalidOrderError('INVALID ORDER')
 
     def goto(self, destination): #Method that moves a bit to a designated location
-        if destination not in self.LocationList:    #In case the given location is not found in the available list, raise the custom error
-            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
-        else:
-            if self.loc == destination: #If the bit is already at the given location, do nothing
-                return ''
-            else:
-                pass
+        if self.go_to:
+            pass
+
+    def draw(self, surface): #Method to blit yourself at your current position
+        surface.blit(self.image, (self.x, self.y))
