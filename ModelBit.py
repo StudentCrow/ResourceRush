@@ -58,6 +58,9 @@ class ModelBit:
         # for location in Locations:
         #    LocList.append(location.name)
         self.LocationList = locations
+        self.LocationListNames = []
+        for i in self.LocationList:
+            self.LocationListNames.append(i.name)
         #['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
 
     #Function that checks if an order is real and calls for the correct method
@@ -85,14 +88,14 @@ class ModelBit:
                         reference = i.split()
                         if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
                             destination = DecomposedOrd[2]
-                            if destination not in self.LocationList.name:  # In case the given location is not found in the available list, raise the custom error
+                            if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
                                 raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
                             else:
                                 if self.loc == destination:  # If the bit is already at the given location, do nothing
                                     return ''
                                 else:
-                                    for location in self.LocationList:  # Get the coordinates from the new location
-                                        if location.name == destination:
+                                    for location in self.LocationListNames:  # Determine the new bit location and let the goto method work by changing its asigned bool
+                                        if location == destination:
                                             self.loc = destination
                                             self.go_to = True
                         else:
@@ -121,7 +124,22 @@ class ModelBit:
 
     def goto(self, destination): #Method that moves a bit to a designated location
         if self.go_to:
-            pass
+            for location in self.LocationList:
+                if location.name == destination:
+                    new_x = location.x
+                    new_y = location.y
+            if self.x != new_x:
+                if new_x < self.x:
+                    self.x -= 10
+                elif new_x > self.x:
+                    self.x += 10
+            if self.y != new_y:
+                if new_y < self.y:
+                    self.y -= 10
+                elif new_y > self.y:
+                    self.y += 10
+            if self.x == new_x and self.y == new_y:
+                self.go_to = False
 
     def draw(self, surface): #Method to blit yourself at your current position
         surface.blit(self.image, (self.x, self.y))
