@@ -1,4 +1,5 @@
 import pygame
+from random import *
 
 class ModelLocation:
     """
@@ -16,4 +17,8 @@ class ModelLocation:
         self.AlertList = []
 
     def GenerateAlert(self):
-        pass
+        alert = choice(['Alert', 'NoAlert'])
+        if alert == 'Alert':
+            pass #Generate alert
+        elif alert == 'NoAlert':
+            pass #Does not generate alert
