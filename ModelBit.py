@@ -1,7 +1,6 @@
 import pygame
-import ModelOrder
-import ModelLocation
-
+from ModelOrder import *
+from ModelLocation import *
 class InvalidOrderError(Exception):
     """
     Custom error that gets executed when the given order to the bit is not valid
@@ -83,23 +82,19 @@ class ModelBit:
                         else:
                             raise InvalidOrderError('INVALID ORDER')
             case 3: #Case when the order is go to
-                for i in self.OrdList:
-                    if self.OrdList.index(i) == 2:
-                        reference = i.split()
-                        if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
-                            destination = DecomposedOrd[2]
-                            if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
-                            else:
-                                if self.loc == destination:  # If the bit is already at the given location, do nothing
-                                    return ''
-                                else:
-                                    for location in self.LocationListNames:  # Determine the new bit location and let the goto method work by changing its asigned bool
-                                        if location == destination:
-                                            self.loc = destination
-                                            self.go_to = True
+                    reference = self.OrdList[2].split()
+                    if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
+                        destination = DecomposedOrd[2]
+                        if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
+                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
                         else:
-                            raise InvalidOrderError('INVALID ORDER')
+                            if self.loc == destination:  # If the bit is already at the given location, do nothing
+                                return ''
+                            else:
+                                self.loc = destination
+                                self.go_to = True
+                    else:
+                        raise InvalidOrderError('INVALID ORDER')
             case 4: #Case when the order is get or store
                 for i in self.OrdList:
                     if self.OrdList.index(i) == 3:
@@ -140,6 +135,73 @@ class ModelBit:
                     self.y += 10
             if self.x == new_x and self.y == new_y:
                 self.go_to = False
+        elif self.go_to == False:
+            print('Go to order has not been given')
 
     def draw(self, surface): #Method to blit yourself at your current position
         surface.blit(self.image, (self.x, self.y))
+
+def main():
+    #Pruebas funcionamiento de órden go to
+    # Uno = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
+    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
+    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
+    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
+    # print(' Prueba bit 1 \n')
+    # print(Uno.loc)
+    # Uno.goto(Uno.loc)
+    # Uno.ReceiveOrder('GO TO ATX')
+    # print(Uno.loc)
+    # while (Uno.go_to):
+    #     Uno.goto(Uno.loc)
+    #     print(Uno.x)
+    #     print(Uno.y)
+    #     print(Uno.go_to)
+    #
+    # Dos = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
+    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
+    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
+    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
+    # print('\n Prueba bit 2 \n')
+    # print(Dos.loc)
+    # Dos.ReceiveOrder('GO TO BIOS')
+    # print(Dos.loc)
+    # Dos.goto(Dos.go_to)
+    #
+    # Tres = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
+    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
+    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
+    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
+    # print('\n Prueba bit 3 \n')
+    # print(Tres.loc)
+    # Tres.ReceiveOrder('GO TO GPU')
+    # print(Tres.loc)
+    # while (Tres.go_to):
+    #     Tres.goto(Tres.loc)
+    #     print(Tres.x)
+    #     print(Tres.y)
+    #     print(Tres.go_to)
+    #
+    # Cuatr = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
+    #                  ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
+    #                  ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40),
+    #                  ModelLocation('CHIPSET', -30, -30),
+    #                  ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
+    # print('\n Prueba bit 4 \n')
+    # print(Cuatr.loc)
+    # Cuatr.ReceiveOrder('GO TO RAM')
+    # print(Cuatr.loc)
+    # i = 0
+    # while (Cuatr.go_to):
+    #     if i == 2:
+    #         Cuatr.ReceiveOrder('GO TO CLK')
+    #     Cuatr.goto(Cuatr.loc)
+    #     print(Cuatr.x)
+    #     print(Cuatr.y)
+    #     print(Cuatr.go_to)
+    #     i += 1
+
+
+
+if __name__ == "__main__":
+    main()
