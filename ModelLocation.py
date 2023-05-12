@@ -1,5 +1,6 @@
 import pygame
 from random import *
+from ModelAlert import *
 
 class ModelLocation:
     """
@@ -36,12 +37,51 @@ class ModelLocation:
         self.AlertNum = AlertNum
         self.x = x
         self.y = y
-        self.AlertNames = ['Alert1', 'Alert2', 'Alert3']
-        self.AlertList = []
 
-    def GenerateAlert(self):
-        alert = choice(['Alert', 'NoAlert'])
-        if alert == 'Alert':
-            pass #Generate alert
-        elif alert == 'NoAlert':
-            pass #Does not generate alert
+        #Different alerts depending on the location:
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            self.AlertNames = ['TOO MUCH GRAPHICS', 'LOW VOLTAGE', 'HIGH TEMPERATURE', 'GRAPHICS NOT WORKING']
+        elif self.name == 'VENT':
+            pass
+
+    def GenerateAlert(self):    #Method that generates alerts when the conditions are met
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            pass
+        elif self.name == 'VENT':
+            pass
