@@ -23,7 +23,7 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, goto = False, fix = False, mine = False):
+    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, load = 0.0, LoadType = '', goto = False, fix = False, mine = False):
         #self.image = pygame.image.load(img_path)    #Load sprite
 
         self.name = name
@@ -34,6 +34,8 @@ class ModelBit:
         self.loc = 'BIOS'   #Location where the bit is currently positionated
         self.x = x
         self.y = y
+        self.load = load
+        self.LoadType = LoadType
 
         self.goto = goto
         self.FixCheck = fix
@@ -71,12 +73,16 @@ class ModelBit:
         numwords = len(DecomposedOrd)
         match numwords: #Determines what to deppending on the value of numwords
             case 1: #Case when the order is mine
-                if self.MineCheck == False:
+                if self.MineCheck == False and self.goto == False:
                     reference = self.OrdList[0]
+                    if reference == DecomposedOrd:
+                        self.MineCheck = True
+                    else:
+                        raise InvalidOrderError('INVALID ORDER')
                 elif self.MineCheck:
                     return ''
             case 2: #Case when the order is fix
-                if self.FixCheck == False and self.subsystem == False:
+                if self.FixCheck == False and self.subsystem == False and self.goto == False:
                     reference = self.OrdList[1]
                     if reference == DecomposedOrd[0]:
                         destination = DecomposedOrd[1]
@@ -147,13 +153,19 @@ class ModelBit:
             if self.x == new_x and self.y == new_y:
                 self.goto = False
         elif self.goto == False:
-            print('Go to order has not been given')
+            print('Go to order has not been given yet')
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:
             destination.custom_alert(self.name) #We call to the custom_alert method from the given location
         elif self.FixCheck == False:
-            print('Fix order has not been given')
+            print('Fix order has not been given yet')
+
+    def mine(self, destination):    #Method that gets a bit to start mining the location it is on at the moment
+        if self.MineCheck:
+            destination.get_mined(self.name)
+        elif self.MineCheck == False:
+            print('Mine order has not been given yet')
 
     def draw(self, surface): #Method to blit yourself at your current position
         surface.blit(self.image, (self.x, self.y))
