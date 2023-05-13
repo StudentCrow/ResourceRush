@@ -167,6 +167,9 @@ class ModelBit:
         elif self.MineCheck == False:
             print('Mine order has not been given yet')
 
+    def load_bit(self): #Method for when a bit gets loaded with resources
+        pass
+
     def draw(self, surface): #Method to blit yourself at your current position
         surface.blit(self.image, (self.x, self.y))
 
