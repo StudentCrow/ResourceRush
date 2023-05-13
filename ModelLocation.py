@@ -1,6 +1,7 @@
 import pygame
 from random import *
 from ModelAlert import *
+from ModelBit import ModelBit
 
 class InvalidFix(Exception):
     """
@@ -126,7 +127,7 @@ class ModelLocation:
         elif self.name == 'VENT':
             pass
 
-    def custom_alert(self): #Method that fixes the alerts that are not value dependant
+    def custom_alert(self, bit): #Method that fixes the alerts that are not value dependant
         if self.name == 'PERI':
             pass
         elif self.name == 'VRM':
@@ -146,14 +147,19 @@ class ModelLocation:
         elif self.name == 'CHIPSET':
             pass
         elif self.name == 'GPU':
-            if self.AlertCounter['GRAPHICS NOT WORKING'] == 1:  #If there is an error it starts fixing it
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 1 and bit.subsystem == True:  #If there is an error it starts fixing it
                 self.CustomAlertPercentage -= randrange(0, 4)   #Decreases the percentage of error left to fix in a random from 1 to 3
                 if self.CustomAlertPercentage < 0:
                     self.CustomAlertPercentage = 0
-                if self.CustomAlertPercentage == 0: #If there is no more error to be fixed, it gets deleted
+                if self.CustomAlertPercentage == 0: #If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
                     self.AlertCounter['GRAPHICS NOT WORKING'] -= 1
+                    bit.subsystem = False
+                    bit.fixBool = False
+            elif self.AlertCounter['GRAPHICS NOT WORKING'] == 0 and bit.subsystem == True: #In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
+                bit.subsystem = False
+                bit.fixBool = False
             else:   #If there is no active error it raises an error
-                raise InvalidFix('NO ERROR RO BE FIXED IN THIS LOCATION')
+                raise InvalidFix('NO ERROR TO BE FIXED IN THIS LOCATION')
         elif self.name == 'VENT':
             pass
 

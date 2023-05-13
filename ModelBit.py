@@ -1,6 +1,6 @@
 import pygame
-from ModelOrder import *
-from ModelLocation import *
+from ModelOrder import ModelOrder
+from ModelLocation import ModelLocation
 class InvalidOrderError(Exception):
     """
     Custom error that gets executed when the given order to the bit is not valid
@@ -23,9 +23,10 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, go_to = False, fix = False):
+    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, goto = False, fix = False):
         #self.image = pygame.image.load(img_path)    #Load sprite
 
+        self.name = name
         self.time = time    #Determines the remining lifetime of the bit
         self.working = working  #Boolean that indicates if the bit is currently working or in standby
         self.subsystem = subsystem  #Boolean that indicates if the bit is working in a subsystem or not
@@ -34,8 +35,8 @@ class ModelBit:
         self.x = x
         self.y = y
 
-        self.go_to = go_to
-        self.fix = fix
+        self.goto = goto
+        self.fixBool = fix
 
         # List of hints of the orders a bit can get
         self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET', 'STORE', 'MOVE']
@@ -64,7 +65,7 @@ class ModelBit:
         #['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
 
     #Function that checks if an order is real and calls for the correct method
-    def ReceiveOrder(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
+    def receive_order(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
         DecomposedOrd = Ord.split() #We get each word of the order into a new list
         numwords = len(DecomposedOrd)
         match numwords: #Determines what to deppending on the value of numwords
@@ -76,17 +77,21 @@ class ModelBit:
                         else:
                             raise InvalidOrderError('INVALID ORDER')
             case 2: #Case when the order is fix
-                if self.fix == False and self.subsystem == False:
+                if self.fixBool == False and self.subsystem == False:
                     reference = self.OrdList[1]
                     if reference == DecomposedOrd[0]:
                         destination = DecomposedOrd[1]
-                        if self.loc != destination:
-                            raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
-                        elif self.loc == destination:
-                            self.fix = True
+                        if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
+                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                        else:
+                            if self.loc != destination:
+                                raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
+                            elif self.loc == destination:
+                                self.fixBool = True
+                                self.subsystem = True
                     else:
                         raise InvalidOrderError('INVALID ORDER')
-                elif self.fix:
+                elif self.fixBool:
                     return ''
             case 3: #Case when the order is go to
                 reference = self.OrdList[2].split()
@@ -99,7 +104,7 @@ class ModelBit:
                             return ''
                         else:
                             self.loc = destination
-                            self.go_to = True
+                            self.goto = True
                 else:
                     raise InvalidOrderError('INVALID ORDER')
             case 4: #Case when the order is get or store
@@ -124,8 +129,8 @@ class ModelBit:
             case _: #Raises custom error
                 raise InvalidOrderError('INVALID ORDER')
 
-    def GoTo(self, destination): #Method that moves a bit to a designated location
-        if self.go_to:
+    def go_to(self, destination): #Method that moves a bit to a designated location
+        if self.goto:
             for location in self.LocationList:
                 if location.name == destination:
                     new_x = location.x
@@ -141,17 +146,14 @@ class ModelBit:
                 elif new_y > self.y:
                     self.y += 10
             if self.x == new_x and self.y == new_y:
-                self.go_to = False
-        elif self.go_to == False:
+                self.goto = False
+        elif self.goto == False:
             print('Go to order has not been given')
 
-    def Fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
-        if self.fix:
-            if destination == self.loc:
-                self.subsystem = True
-            else:
-                return ''
-        elif self.fix == False:
+    def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
+        if self.fixBool:
+            destination.custom_alert(self.name) #We call to the custom_alert method from the given location
+        elif self.fixBool == False:
             print('Fix order has not been given')
 
     def draw(self, surface): #Method to blit yourself at your current position
