@@ -65,7 +65,7 @@ class ModelLocation:
         elif self.name == 'VENT':
             pass
 
-    def ManageAlerts(self):    #Method that generates alerts when the conditions are met
+    def manage_alerts(self):    #Method that generates alerts when the conditions are met
         if self.name == 'PERI':
             pass
         elif self.name == 'VRM':
@@ -87,11 +87,7 @@ class ModelLocation:
         elif self.name == 'GPU':
             ###
             #Random increase of graphics usage between 0% and 10%
-            if self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Graphics only increase if working
-                if self.graphics < 1:
-                    self.graphics += round(uniform(0.0, 0.1),2)
-                    if self.graphics > 1:
-                        self.graphics += round(uniform(0.0, 0.01),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
+            self.generate_resource()
             ###
             #Graphics errors
             if self.graphics >= 0.8 and self.AlertCounter['TOO MUCH GRAPHICS'] == 0:    #Activates the too much graphic usage alert
@@ -119,7 +115,7 @@ class ModelLocation:
         elif self.name == 'VENT':
             pass
 
-    def TempIncrease(self): #Method to calculate how much temperature does the location have
+    def temp_increase(self): #Method to calculate how much temperature does the location have
         if self.name == 'PERI':
             pass
         elif self.name == 'VRM':
@@ -144,5 +140,58 @@ class ModelLocation:
                     self.temperature += 1
             else:
                 self.temperature = self.consumption*(self.graphics - 0.89) + 75
+        elif self.name == 'VENT':
+            pass
+
+    def power_management(self):    #Method to calculate how much power the location has each second
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            self.power -= self.consumption*(self.graphics - 0.9) + self.consumption
+            #Must add how the power can increase when bringed by a bit
+        elif self.name == 'VENT':
+            pass
+
+    def generate_resource(self):    #Method that generates the 'resources' of each specific location
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Graphics only increase if working
+                if self.graphics < 1:
+                    self.graphics += round(uniform(0.0, 0.1),2)
+                    if self.graphics >= 1:
+                        self.graphics += round(uniform(0.0, 0.01),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
         elif self.name == 'VENT':
             pass
