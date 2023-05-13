@@ -7,8 +7,10 @@ class InvalidOrderError(Exception):
     """
     def __init__(self, message):
         self.message = message
+
     def __str__(self):
         return self.message
+
 
 class InvalidLocationError(Exception):
     """
@@ -16,15 +18,18 @@ class InvalidLocationError(Exception):
     """
     def __init__(self, message):
         self.message = message
+
     def __str__(self):
         return self.message
+
 
 class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, load = 0.0, LoadType = '', goto = False, fix = False, mine = False):
-        #self.image = pygame.image.load(img_path)    #Load sprite
+    def __init__(self, name, locations, time=0.0, working=False, subsystem=False,
+                 critic=False, x=0, y=0, load=0.0, LoadType='', GoToCheck=False, fix=False, mine=False):
+        # self.image = pygame.image.load(img_path)    Load sprite
 
         self.name = name
         self.time = time    #Determines the remining lifetime of the bit
@@ -37,7 +42,7 @@ class ModelBit:
         self.load = load
         self.LoadType = LoadType
 
-        self.goto = goto
+        self.GoToCheck = GoToCheck
         self.FixCheck = fix
         self.MineCheck = mine
 
@@ -49,7 +54,7 @@ class ModelBit:
         #    MOVE RESOURCE FROM LOCATION TO LOCATION, 5
         #    FIX LOCATION, 2
         #    GET RESOURCE FROM LOCATION, 4
-        #    STORE RESOURCE TO LOCATION, 4
+        #    STORE RESOURCE IN LOCATION, 4
 
         # List of the valid locations
         # It will have to be the list obtained with the determined objects of ModelLocation
@@ -69,72 +74,83 @@ class ModelBit:
 
     #Function that checks if an order is real and calls for the correct method
     def receive_order(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
-        DecomposedOrd = Ord.split() #We get each word of the order into a new list
-        numwords = len(DecomposedOrd)
-        match numwords: #Determines what to deppending on the value of numwords
-            case 1: #Case when the order is mine
-                if self.MineCheck == False and self.goto == False:
-                    reference = self.OrdList[0]
-                    if reference == DecomposedOrd:
-                        self.MineCheck = True
-                    else:
-                        raise InvalidOrderError('INVALID ORDER')
-                elif self.MineCheck:
-                    return ''
-            case 2: #Case when the order is fix
-                if self.FixCheck == False and self.subsystem == False and self.goto == False:
-                    reference = self.OrdList[1]
-                    if reference == DecomposedOrd[0]:
-                        destination = DecomposedOrd[1]
+        if not self.subsystem:
+            DecomposedOrd = Ord.split() #We get each word of the order into a new list
+            numwords = len(DecomposedOrd)
+            match numwords: #Determines what to deppending on the value of numwords
+                case 1: #Case when the order is mine
+                    if not self.MineCheck and not self.GoToCheck == False:
+                        reference = self.OrdList[0]
+                        if reference == DecomposedOrd:
+                            self.MineCheck = True
+                        else:
+                            raise InvalidOrderError('INVALID ORDER')
+                    elif self.MineCheck:
+                        return ''
+                case 2: #Case when the order is fix
+                    if not self.GoToCheck:
+                        reference = self.OrdList[1]
+                        if reference == DecomposedOrd[0]:
+                            destination = DecomposedOrd[1]
+                            if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
+                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                            else:
+                                if self.loc != destination:
+                                    raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
+                                elif self.loc == destination:
+                                    self.MineCheck = False
+                                    self.FixCheck = True
+                                    self.subsystem = True
+                        else:
+                            raise InvalidOrderError('INVALID ORDER')
+                case 3: #Case when the order is go to
+                    reference = self.OrdList[2].split()
+                    if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
+                        destination = DecomposedOrd[2]
                         if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
                             raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
                         else:
-                            if self.loc != destination:
-                                raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
-                            elif self.loc == destination:
-                                self.FixCheck = True
-                                self.subsystem = True
+                            if self.loc == destination:  # If the bit is already at the given location, do nothing
+                                return ''
+                            else:
+                                self.loc = destination
+                                self.MineCheck = False
+                                self.GoToCheck = True
                     else:
                         raise InvalidOrderError('INVALID ORDER')
-                elif self.FixCheck:
-                    return ''
-            case 3: #Case when the order is go to
-                reference = self.OrdList[2].split()
-                if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
-                    destination = DecomposedOrd[2]
-                    if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                        raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                case 4: #Case when the order is get or store
+                    #Have to add resource check list
+                    GetReference = self.OrdList[3].split()
+                    StoreReference = self.OrdList[4].split()
+                    if GetReference[0] == DecomposedOrd[0]: #The order is a get
+                        pass
+                    elif StoreReference[0] == DecomposedOrd[0]: #The order is a store
+                        destination = DecomposedOrd[3]
+                        if destination not in self.LocationListNames:
+                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                        else:
+                            if destination != self.loc:
+                                return ''
+                            else:
+                                self.MineCheck = False
+                                destination.get_power(self.name)
                     else:
-                        if self.loc == destination:  # If the bit is already at the given location, do nothing
-                            return ''
-                        else:
-                            self.loc = destination
-                            self.goto = True
-                else:
+                        raise InvalidOrderError('INVALID ORDER')
+                case 5: #Case when the order is move
+                    for i in self.OrdList:
+                        if self.OrdList.index(i) == 5:
+                            reference = i
+                            if reference == DecomposedOrd[0]:
+                                pass    #Start move method
+                            else:
+                                raise InvalidOrderError('INVALID ORDER')
+                case _: #Raises custom error
                     raise InvalidOrderError('INVALID ORDER')
-            case 4: #Case when the order is get or store
-                #Have to add resource check list
-                GetReference = self.OrdList[3].split()
-                StoreReference = self.OrdList[4].split()
-                if GetReference[0] == DecomposedOrd[0]:
-                    pass
-                elif StoreReference[0] == DecomposedOrd[0]:
-                    pass
-                else:
-                    raise InvalidOrderError('INVALID ORDER')
-            case 5: #Case when the order is move
-                for i in self.OrdList:
-                    if self.OrdList.index(i) == 5:
-                        reference = i
-                        if reference == DecomposedOrd[0]:
-                            pass    #Start move method
-                        else:
-                            raise InvalidOrderError('INVALID ORDER')
-            case _: #Raises custom error
-                raise InvalidOrderError('INVALID ORDER')
+        else:
+            raise InvalidOrderError('CANT RECEIVE AN ORDER WHILE IN A SUBSYSTEM')
 
     def go_to(self, destination): #Method that moves a bit to a designated location
-        if self.goto:
+        if self.GoToCheck:
             for location in self.LocationList:
                 if location.name == destination:
                     new_x = location.x
@@ -150,20 +166,20 @@ class ModelBit:
                 elif new_y > self.y:
                     self.y += 10
             if self.x == new_x and self.y == new_y:
-                self.goto = False
-        elif self.goto == False:
+                self.GoToCheck = False
+        elif not self.GoToCheck:
             print('Go to order has not been given yet')
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:
             destination.custom_alert(self.name) #We call to the custom_alert method from the given location
-        elif self.FixCheck == False:
+        elif not self.FixCheck:
             print('Fix order has not been given yet')
 
     def mine(self, destination):    #Method that gets a bit to start mining the location it is on at the moment
         if self.MineCheck:
             destination.get_mined(self.name)
-        elif self.MineCheck == False:
+        elif not self.MineCheck:
             print('Mine order has not been given yet')
 
     def load_bit(self): #Method for when a bit gets loaded with resources
@@ -180,11 +196,11 @@ def main():
     #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
     # print(' Prueba bit 1 \n')
     # print(Uno.loc)
-    # Uno.GoTo(Uno.loc)
+    # Uno.GoToCheck(Uno.loc)
     # Uno.ReceiveOrder('GO TO ATX')
     # print(Uno.loc)
     # while (Uno.go_to):
-    #     Uno.GoTo(Uno.loc)
+    #     Uno.GoToCheck(Uno.loc)
     #     print(Uno.x)
     #     print(Uno.y)
     #     print(Uno.go_to)
@@ -197,7 +213,7 @@ def main():
     # print(Dos.loc)
     # Dos.ReceiveOrder('GO TO BIOS')
     # print(Dos.loc)
-    # Dos.GoTo(Dos.go_to)
+    # Dos.GoToCheck(Dos.go_to)
     #
     # Tres = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
     #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
@@ -208,7 +224,7 @@ def main():
     # Tres.ReceiveOrder('GO TO GPU')
     # print(Tres.loc)
     # while (Tres.go_to):
-    #     Tres.GoTo(Tres.loc)
+    #     Tres.GoToCheck(Tres.loc)
     #     print(Tres.x)
     #     print(Tres.y)
     #     print(Tres.go_to)
@@ -226,7 +242,7 @@ def main():
     # while (Cuatr.go_to):
     #     if i == 2:
     #         Cuatr.ReceiveOrder('GO TO CLK')
-    #     Cuatr.GoTo(Cuatr.loc)
+    #     Cuatr.GoToCheck(Cuatr.loc)
     #     print(Cuatr.x)
     #     print(Cuatr.y)
     #     print(Cuatr.go_to)
