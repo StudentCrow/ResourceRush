@@ -249,7 +249,7 @@ class ModelLocation:
                 if self.graphics < 1:
                     self.graphics += round(uniform(0.0, 0.1),2)
                     if self.graphics >= 1:
-                        self.graphics += round(uniform(0.0, 0.01),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
+                        self.graphics += round(uniform(0.0, 0.03),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
         elif self.name == 'VENT':
             pass
 
