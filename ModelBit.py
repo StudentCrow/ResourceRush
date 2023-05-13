@@ -113,16 +113,15 @@ class ModelBit:
                 else:
                     raise InvalidOrderError('INVALID ORDER')
             case 4: #Case when the order is get or store
-                for i in self.OrdList:
-                    if self.OrdList.index(i) == 3:
-                        GetReference = i
-                        StoreReference = self.OrdList[self.OrdList.index(i)+1]
-                        if GetReference == DecomposedOrd[0]:
-                            pass    #Start get method
-                        elif StoreReference == DecomposedOrd[0]:
-                            pass    #Start store method
-                        else:
-                            raise InvalidOrderError('INVALID ORDER')
+                #Have to add resource check list
+                GetReference = self.OrdList[3].split()
+                StoreReference = self.OrdList[4].split()
+                if GetReference[0] == DecomposedOrd[0]:
+                    pass
+                elif StoreReference[0] == DecomposedOrd[0]:
+                    pass
+                else:
+                    raise InvalidOrderError('INVALID ORDER')
             case 5: #Case when the order is move
                 for i in self.OrdList:
                     if self.OrdList.index(i) == 5:

@@ -279,3 +279,27 @@ class ModelLocation:
                 raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
         elif self.name == 'VENT':
             pass
+
+    def get_power(self, bit):    #Method for when a bit gives power to a location
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            pass
+        elif self.name == 'VENT':
+            pass
