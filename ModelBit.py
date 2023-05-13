@@ -27,8 +27,9 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, name, locations, time=0.0, working=False, subsystem=False,
-                 critic=False, x=0, y=0, load=0.0, LoadType='', GoToCheck=False, fix=False, mine=False):
+    def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
+                 subsystem=False, critic=False, load=0.0, goto=False, fix=False,
+                 mine=False, move=False):
         # self.image = pygame.image.load(img_path)    Load sprite
 
         self.name = name
@@ -40,11 +41,12 @@ class ModelBit:
         self.x = x
         self.y = y
         self.load = load
-        self.LoadType = LoadType
+        self.limit = limit
 
-        self.GoToCheck = GoToCheck
+        self.GoToCheck = goto
         self.FixCheck = fix
         self.MineCheck = mine
+        self.MoveCheck = move
 
         # List of hints of the orders a bit can get
         self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET', 'STORE', 'MOVE']
@@ -79,7 +81,7 @@ class ModelBit:
             numwords = len(DecomposedOrd)
             match numwords: #Determines what to deppending on the value of numwords
                 case 1: #Case when the order is mine
-                    if not self.MineCheck and not self.GoToCheck == False:
+                    if not self.MineCheck and not self.GoToCheck and not self.MoveCheck:
                         reference = self.OrdList[0]
                         if reference == DecomposedOrd:
                             self.MineCheck = True
@@ -88,12 +90,12 @@ class ModelBit:
                     elif self.MineCheck:
                         return ''
                 case 2: #Case when the order is fix
-                    if not self.GoToCheck:
+                    if not self.GoToCheck and not self.MoveCheck:
                         reference = self.OrdList[1]
                         if reference == DecomposedOrd[0]:
                             destination = DecomposedOrd[1]
                             if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
                             else:
                                 if self.loc != destination:
                                     raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
@@ -108,42 +110,46 @@ class ModelBit:
                     if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
                         destination = DecomposedOrd[2]
                         if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
                         else:
                             if self.loc == destination:  # If the bit is already at the given location, do nothing
                                 return ''
                             else:
                                 self.loc = destination
                                 self.MineCheck = False
+                                self.MoveCheck = False
                                 self.GoToCheck = True
                     else:
                         raise InvalidOrderError('INVALID ORDER')
                 case 4: #Case when the order is get or store
-                    #Have to add resource check list
-                    GetReference = self.OrdList[3].split()
-                    StoreReference = self.OrdList[4].split()
-                    if GetReference[0] == DecomposedOrd[0]: #The order is a get
-                        pass
-                    elif StoreReference[0] == DecomposedOrd[0]: #The order is a store
-                        destination = DecomposedOrd[3]
-                        if destination not in self.LocationListNames:
-                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                    if not self.GoToCheck and not self.MoveCheck:
+                        GetReference = self.OrdList[3].split()
+                        StoreReference = self.OrdList[4].split()
+                        if GetReference[0] == DecomposedOrd[0]: #The order is a get
+                            destination = DecomposedOrd[3]
+                            if destination not in self.LocationListNames:
+                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                            else:
+                                if destination != self.loc:
+                                    return ''
+                                else:
+                                    self.MineCheck = False
+                                    destination.give_power(self.name)
+
+                        elif StoreReference[0] == DecomposedOrd[0]: #The order is a store
+                            destination = DecomposedOrd[3]
+                            if destination not in self.LocationListNames:
+                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                            else:
+                                if destination != self.loc:
+                                    return ''
+                                else:
+                                    self.MineCheck = False
+                                    destination.get_power(self.name)    #Method from ModelLocation that gets power from a bit
                         else:
-                            if destination != self.loc:
-                                return ''
-                            else:
-                                self.MineCheck = False
-                                destination.get_power(self.name)
-                    else:
-                        raise InvalidOrderError('INVALID ORDER')
+                            raise InvalidOrderError('INVALID ORDER')
                 case 5: #Case when the order is move
-                    for i in self.OrdList:
-                        if self.OrdList.index(i) == 5:
-                            reference = i
-                            if reference == DecomposedOrd[0]:
-                                pass    #Start move method
-                            else:
-                                raise InvalidOrderError('INVALID ORDER')
+                    pass
                 case _: #Raises custom error
                     raise InvalidOrderError('INVALID ORDER')
         else:
@@ -182,7 +188,7 @@ class ModelBit:
         elif not self.MineCheck:
             print('Mine order has not been given yet')
 
-    def load_bit(self): #Method for when a bit gets loaded with resources
+    def move(self, destination1, destination2): #Method that moves a bit from one place to another carrying power from 1 to 2
         pass
 
     def draw(self, surface): #Method to blit yourself at your current position

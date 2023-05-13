@@ -286,4 +286,6 @@ class ModelLocation:
         bit.load = 0
 
     def give_power(self, bit):  #Method for when a bit gets power from a location
-        pass
+        charge = bit.limit - bit.load
+        self.power -= charge
+        bit.load = bit.limit
