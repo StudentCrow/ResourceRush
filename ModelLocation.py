@@ -29,14 +29,13 @@ class ModelLocation:
     #     pass
     # elif self.name == 'VENT':
     #     pass
-    def __init__(self, name, x, y, functional = False, consumption = 0, temperature = 0.0, AlertNum = 0):
+    def __init__(self, name, x, y, functional = False, power = 0.0, temperature = 0.0):
         # self.image = pygame.image.load(img_path)    #Load sprite
 
         self.name = name
         self.functional = functional
-        self.consumption = consumption
+        self.power = power
         self.temperature = temperature
-        self.AlertNum = AlertNum
         self.x = x
         self.y = y
 
@@ -60,12 +59,13 @@ class ModelLocation:
         elif self.name == 'CHIPSET':
             pass
         elif self.name == 'GPU':
-            self.AlertNames = ['TOO MUCH GRAPHICS', 'LOW VOLTAGE', 'HIGH TEMPERATURE', 'GRAPHICS NOT WORKING']
+            self.AlertCounter = {'TOO MUCH GRAPHICS': 0, 'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'GRAPHICS NOT WORKING': 0}
             self.graphics = 0.0
+            self.consumption = 170.0
         elif self.name == 'VENT':
             pass
 
-    def GenerateAlert(self):    #Method that generates alerts when the conditions are met
+    def ManageAlerts(self):    #Method that generates alerts when the conditions are met
         if self.name == 'PERI':
             pass
         elif self.name == 'VRM':
@@ -86,13 +86,36 @@ class ModelLocation:
             pass
         elif self.name == 'GPU':
             ###
-            #Random increase of graphics usage
-            if self.graphics < 1:
-                self.graphics += round(random(),2)
-                if self.graphics > 1:
-                    self.graphics = 1
+            #Random increase of graphics usage between 0% and 10%
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Graphics only increase if working
+                if self.graphics < 1:
+                    self.graphics += round(uniform(0.0, 0.1),2)
+                    if self.graphics > 1:
+                        self.graphics += round(uniform(0.0, 0.01),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
             ###
+            #Graphics errors
+            if self.graphics >= 0.8 and self.AlertCounter['TOO MUCH GRAPHICS'] == 0:    #Activates the too much graphic usage alert
+                self.AlertCounter['TOO MUCH GRAPHICS'] += 1
+            elif self.graphics < 0.8 and self.AlertCounter['TOO MUCH GRAPHICS'] == 1:   #Deactivates the too much graphic usage alert
+                self.AlertCounter['TOO MUCH GRAPHICS'] -= 1
 
+            if self.graphics > 0.65 and self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Activates with a 15% chance the graphics not working error if graphic usage abive 65%
+                error = random()
+                if error > 0.85:
+                    self.AlertCounter['GRAPHICS NOT WORKING'] += 1
+                    self.graphics = 0
+            ###
+            #Temperature error
+            if self.temperature >= 93.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                self.AlertCounter['HIGH TEMPERATURE'] += 1
+            elif self.temperature < 93.0 and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                self.AlertCounter['HIGH TEMPERATURE'] -= 1
+            ###
+            #Power error
+            if self.power <= 425.0 and self.AlertCounter['LOW POWER'] == 0:
+                self.AlertCounter['LOW POWER'] += 1
+            elif self.power > 425.0 and self.AlertCounter['LOW POWER'] == 1:
+                self.AlertCounter['LOW POWER'] -= 1
         elif self.name == 'VENT':
             pass
 
