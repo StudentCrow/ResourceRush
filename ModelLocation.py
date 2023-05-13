@@ -69,6 +69,7 @@ class ModelLocation:
             pass
         elif self.name == 'GPU':
             self.AlertCounter = {'TOO MUCH GRAPHICS': 0, 'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'GRAPHICS NOT WORKING': 0}
+            self.CustomAlertPercentage = 0
             self.graphics = 0.0
             self.consumption = 170.0
         elif self.name == 'VENT':
@@ -108,6 +109,7 @@ class ModelLocation:
                 error = random()
                 if error > 0.85:
                     self.AlertCounter['GRAPHICS NOT WORKING'] += 1
+                    self.CustomAlertPercentage = 100
                     self.graphics = 0
             ###
             #Temperature error
@@ -144,9 +146,13 @@ class ModelLocation:
         elif self.name == 'CHIPSET':
             pass
         elif self.name == 'GPU':
-            if self.AlertCounter['GRAPHICS NOT WORKING'] == 1:
-                pass
-            else:
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 1:  #If there is an error it starts fixing it
+                self.CustomAlertPercentage -= randrange(0, 4)   #Decreases the percentage of error left to fix in a random from 1 to 3
+                if self.CustomAlertPercentage < 0:
+                    self.CustomAlertPercentage = 0
+                if self.CustomAlertPercentage == 0: #If there is no more error to be fixed, it gets deleted
+                    self.AlertCounter['GRAPHICS NOT WORKING'] -= 1
+            else:   #If there is no active error it raises an error
                 raise InvalidFix('NO ERROR RO BE FIXED IN THIS LOCATION')
         elif self.name == 'VENT':
             pass
