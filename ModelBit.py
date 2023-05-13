@@ -23,7 +23,7 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, goto = False, fix = False):
+    def __init__(self, name, locations, time = 0.0, working = False, subsystem = False, critic = False, x = 0, y = 0, goto = False, fix = False, mine = False):
         #self.image = pygame.image.load(img_path)    #Load sprite
 
         self.name = name
@@ -36,7 +36,8 @@ class ModelBit:
         self.y = y
 
         self.goto = goto
-        self.fixBool = fix
+        self.FixCheck = fix
+        self.MineCheck = mine
 
         # List of hints of the orders a bit can get
         self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET', 'STORE', 'MOVE']
@@ -70,14 +71,12 @@ class ModelBit:
         numwords = len(DecomposedOrd)
         match numwords: #Determines what to deppending on the value of numwords
             case 1: #Case when the order is mine
-                for i in self.OrdList:
-                    if self.OrdList.index(i) == 0:
-                        if i ==  DecomposedOrd:
-                            pass
-                        else:
-                            raise InvalidOrderError('INVALID ORDER')
+                if self.MineCheck == False:
+                    reference = self.OrdList[0]
+                elif self.MineCheck:
+                    return ''
             case 2: #Case when the order is fix
-                if self.fixBool == False and self.subsystem == False:
+                if self.FixCheck == False and self.subsystem == False:
                     reference = self.OrdList[1]
                     if reference == DecomposedOrd[0]:
                         destination = DecomposedOrd[1]
@@ -87,11 +86,11 @@ class ModelBit:
                             if self.loc != destination:
                                 raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
                             elif self.loc == destination:
-                                self.fixBool = True
+                                self.FixCheck = True
                                 self.subsystem = True
                     else:
                         raise InvalidOrderError('INVALID ORDER')
-                elif self.fixBool:
+                elif self.FixCheck:
                     return ''
             case 3: #Case when the order is go to
                 reference = self.OrdList[2].split()
@@ -151,9 +150,9 @@ class ModelBit:
             print('Go to order has not been given')
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
-        if self.fixBool:
+        if self.FixCheck:
             destination.custom_alert(self.name) #We call to the custom_alert method from the given location
-        elif self.fixBool == False:
+        elif self.FixCheck == False:
             print('Fix order has not been given')
 
     def draw(self, surface): #Method to blit yourself at your current position
