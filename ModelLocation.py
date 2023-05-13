@@ -12,6 +12,15 @@ class InvalidFix(Exception):
     def __str__(self):
         return self.message
 
+class MiningError(Exception):
+    """
+    Custom error for when the mining method gets called but mining in the location is not possible at the moment
+    """
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
+
 class ModelLocation:
     """
     Class for the model part of the interactive locations of the game
@@ -241,5 +250,32 @@ class ModelLocation:
                     self.graphics += round(uniform(0.0, 0.1),2)
                     if self.graphics >= 1:
                         self.graphics += round(uniform(0.0, 0.01),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
+        elif self.name == 'VENT':
+            pass
+
+    def get_mined(self, bit):    #Method for when it is mined by a bit
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':    #In GPU case, its graphic usage must be reduced
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 0:
+                self.graphics -= round(uniform(0.005, 0.03), 2)
+            else:
+                raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
         elif self.name == 'VENT':
             pass
