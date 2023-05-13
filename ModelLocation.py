@@ -2,6 +2,15 @@ import pygame
 from random import *
 from ModelAlert import *
 
+class InvalidFix(Exception):
+    """
+    Custom error for when a fix method is called but there is not an available error to be fixed
+    """
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
+
 class ModelLocation:
     """
     Class for the model part of the interactive locations of the game
@@ -112,6 +121,33 @@ class ModelLocation:
                 self.AlertCounter['LOW POWER'] += 1
             elif self.power > 425.0 and self.AlertCounter['LOW POWER'] == 1:
                 self.AlertCounter['LOW POWER'] -= 1
+        elif self.name == 'VENT':
+            pass
+
+    def custom_alert(self): #Method that fixes the alerts that are not value dependant
+        if self.name == 'PERI':
+            pass
+        elif self.name == 'VRM':
+            pass
+        elif self.name == 'RAM':
+            pass
+        elif self.name == 'ATX':
+            pass
+        elif self.name == 'CPU':
+            pass
+        elif self.name == 'DISK':
+            pass
+        elif self.name == 'CLK':
+            pass
+        elif self.name == 'BIOS':
+            pass
+        elif self.name == 'CHIPSET':
+            pass
+        elif self.name == 'GPU':
+            if self.AlertCounter['GRAPHICS NOT WORKING'] == 1:
+                pass
+            else:
+                raise InvalidFix('NO ERROR RO BE FIXED IN THIS LOCATION')
         elif self.name == 'VENT':
             pass
 
