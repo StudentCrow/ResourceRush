@@ -28,6 +28,7 @@ class ModelBit:
     Model part class that controls each individual bit
     """
     counter = 0 #Counts the number of bits existing
+    kill_counter = 0 #Counts which was the last bit to die
 
     def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
                  subsystem=False, critic=False, load=0.0, goto=False, fix=False,

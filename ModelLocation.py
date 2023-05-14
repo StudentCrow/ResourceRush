@@ -90,7 +90,9 @@ class ModelLocation:
             self.CustomAlertPercentage = 0
             self.BitBuilding = 0.0
         elif self.name == 'CHIPSET':
-            pass
+            self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0}
+            self.chipset_power = 0.0
+            self.consumption = 8.55
         elif self.name == 'GPU':
             self.AlertCounter = {'TOO MUCH GRAPHICS': 0, 'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'GRAPHICS NOT WORKING': 0}
             self.CustomAlertPercentage = 0
@@ -118,10 +120,14 @@ class ModelLocation:
             pass
         elif self.name == 'CLK':
             pass
-        elif self.name == 'BIOS':
+        elif self.name == 'BIOS':   #Is always functional
             pass
         elif self.name == 'CHIPSET':
-            pass
+            self.functional = False
+            self.temperature = 0.0
+            self.chipset_power = 0.0
+            if self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                self.AlertCounter['HIGH TEMPERATURE'] -= 1
         elif self.name == 'GPU':
             self.functional = False
             self.temperature = 0.0
@@ -161,7 +167,13 @@ class ModelLocation:
                         self.power = 0.0
                 ###
             elif self.name == 'CHIPSET':
-                pass
+                ###
+                #Temperature error
+                if self.temperature >= 55.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < 55.0 and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
             elif self.name == 'GPU':
                 ###
                 #Random increase of graphics usage between 0% and 10%
@@ -251,8 +263,10 @@ class ModelLocation:
                 elif self.AlertCounter['BIOS NOT WORKING'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
                     bit.subsystem = False
                     bit.fixBool = False
-            elif self.name == 'CHIPSET':
-                pass
+            elif self.name == 'CHIPSET':    #Does not have custom alert
+                if bit.subsystem:
+                    bit.subsystem = False
+                    bit.fixBool = False
             elif self.name == 'GPU':
                 if self.AlertCounter['GRAPHICS NOT WORKING'] == 1 and bit.subsystem:  #If there is an error it starts fixing it
                     self.CustomAlertPercentage -= randrange(0, 4)   #Decreases the percentage of error left to fix in a random from 1 to 3
@@ -307,7 +321,10 @@ class ModelLocation:
             elif self.name == 'BIOS':
                 self.temperature = self.power*0.1
             elif self.name == 'CHIPSET':
-                pass
+                if self.temperature <= 30:
+                    self.temperature += 1
+                else:
+                    pass
             elif self.name == 'GPU':
                 if self.graphics <= 0.89:
                     if self.temperature < 75:
@@ -388,6 +405,8 @@ class ModelLocation:
                 self.BitBuilding += round(uniform(0.0, 2.5), 2)
                 if self.BitBuilding >= 100.0:
                     self.BitBuilding = 0.0
+                    if ModelBit.counter == 64:
+                        ModelBit.counter = 0
                     bit_name = str(ModelBit.counter + 1)
                     new_bit = 'Bit'+bit_name+'=ModelBit('+bit_name+'locations)' #Hace falta revisar esto cuando se tenga la version final
                     exec(new_bit)
@@ -426,7 +445,10 @@ class ModelLocation:
             elif self.name == 'CLK':
                 pass
             elif self.name == 'BIOS':
-                pass
+                if self.AlertCounter['BIOS NOT WORKING'] == 0 and self.power > 0:
+                    self.generate_resource()
+                else:
+                    raise MiningError('MINING IS NOT POSSIBLE IN BIOS RIGHT NOW')
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':    #In GPU case, its graphic usage must be reduced
