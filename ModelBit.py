@@ -27,10 +27,14 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
+    counter = 0 #Counts the number of bits existing
+
     def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
                  subsystem=False, critic=False, load=0.0, goto=False, fix=False,
                  mine=False, move=False):
         # self.image = pygame.image.load(img_path)    Load sprite
+
+        ModelBit.counter += 1
 
         self.name = name
         self.time = time    #Determines the remining lifetime of the bit

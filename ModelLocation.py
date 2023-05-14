@@ -60,12 +60,11 @@ class ModelLocation:
     #     pass
     # elif self.name == 'VENT':
     #     pass
-    def __init__(self, name, x, y, power=0.0, temperature=0.0, functional=False, reset=False):
+    def __init__(self, name, x, y, power=0.0, temperature=0.0, functional=False):
         # self.image = pygame.image.load(img_path)    #Load sprite
 
         self.name = name
         self.functional = functional
-        self.reset = reset  #Used to trigger the reset method only once
         self.power = power
         self.temperature = temperature
         self.x = x
@@ -86,8 +85,10 @@ class ModelLocation:
             pass
         elif self.name == 'CLK':
             pass
-        elif self.name == 'BIOS':
-            pass
+        elif self.name == 'BIOS': #Bios should be always functional
+            self.AlertCounter = {'BIOS NOT WORKING' : 0}
+            self.CustomAlertPercentage = 0
+            self.BitBuilding = 0.0
         elif self.name == 'CHIPSET':
             pass
         elif self.name == 'GPU':
@@ -133,7 +134,6 @@ class ModelLocation:
             self.functional= False
             self.temperature = 0.0
             self.rpm = 0.0
-            pass
 
     def manage_alerts(self):    #Method that generates alerts when the conditions are met
         if self.functional:
@@ -152,7 +152,14 @@ class ModelLocation:
             elif self.name == 'CLK':
                 pass
             elif self.name == 'BIOS':
-                pass
+                ###
+                #Random BIOS error
+                if self.AlertCounter['BIOS NOT WORKING'] == 0:
+                    error = round(random(), 2)
+                    if error > 0.99:
+                        self.AlertCounter['BIOS NOT WORKING'] += 1
+                        self.power = 0.0
+                ###
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':
@@ -170,7 +177,7 @@ class ModelLocation:
                     error = round(random(), 2)
                     if error > 0.85:    #15% chance for the error to trigger
                         self.AlertCounter['GRAPHICS NOT WORKING'] += 1
-                        self.CustomAlertPercentage = 100
+                        self.CustomAlertPercentage += 100
                         self.graphics = 0.0
                 ###
                 #Temperature error
@@ -233,7 +240,17 @@ class ModelLocation:
             elif self.name == 'CLK':
                 pass
             elif self.name == 'BIOS':
-                pass
+                if self.AlertCounter['BIOS NOT WORKING'] == 1 and bit.subsystem:
+                    self.CustomAlertPercentage -= randrange(0, 4)
+                    if self.CustomAlertPercentage < 0:
+                        self.CustomAlertPercentage = 0
+                    if self.CustomAlertPercentage == 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
+                        self.AlertCounter['BIOS NOT WORKING'] -= 1
+                        bit.subsystem = False
+                        bit.fixBool = False
+                elif self.AlertCounter['BIOS NOT WORKING'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
+                    bit.subsystem = False
+                    bit.fixBool = False
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':
@@ -266,7 +283,6 @@ class ModelLocation:
                 elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
                     bit.subsystem = False
                     bit.fixBool = False
-
         else:
             bit.subsystem = False
             bit.fixBool = False
@@ -289,7 +305,7 @@ class ModelLocation:
             elif self.name == 'CLK':
                 pass
             elif self.name == 'BIOS':
-                pass
+                self.temperature = self.power*0.1
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':
@@ -322,7 +338,7 @@ class ModelLocation:
             pass
         elif self.name == 'CLK':
             pass
-        elif self.name == 'BIOS':
+        elif self.name == 'BIOS': #Does not naturally consume power
             pass
         elif self.name == 'CHIPSET':
             pass
@@ -367,8 +383,14 @@ class ModelLocation:
                 pass
             elif self.name == 'CLK':
                 pass
-            elif self.name == 'BIOS':
-                pass
+            elif self.name == 'BIOS':   #Uses power to build bits
+                self.power -= 1
+                self.BitBuilding += round(uniform(0.0, 2.5), 2)
+                if self.BitBuilding >= 100.0:
+                    self.BitBuilding = 0.0
+                    bit_name = str(ModelBit.counter + 1)
+                    new_bit = 'Bit'+bit_name+'=ModelBit('+bit_name+'locations)' #Hace falta revisar esto cuando se tenga la version final
+                    exec(new_bit)
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':
