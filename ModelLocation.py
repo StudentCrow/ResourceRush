@@ -100,7 +100,7 @@ class ModelLocation:
             self.CustomAlertPercentage = 0
             self.VentNum = 3.0
             self.rpm = 0.0  # Average rpm from 800 to 1000
-            self.consumption = 3.0*self.VentNum
+            self.consumption = 3.0
 
     def reset_location(self):   #Method that resets everything for when it gets turned on or off
         if self.name == 'PERI':
@@ -257,7 +257,11 @@ class ModelLocation:
                 else:
                     self.temperature = self.consumption*(self.graphics - 0.89) + 75
             elif self.name == 'VENT':
-                pass
+                if self.rpm <= 2400.0:
+                    if self.temperature > -30:
+                        self.temperature -= 1
+                else:
+                    self.temperature = -(self.consumption*(3.6 + self.rpm) + 30)
         else:
             pass
 
@@ -284,13 +288,26 @@ class ModelLocation:
             if self.power >= self.consumption:
                 if not self.functional:
                     self.functional = True
-                self.power -= self.consumption*(self.graphics - 0.9) + self.consumption
+                variable_consumption = self.graphics - 0.9
+                if variable_consumption < 0:
+                    variable_consumption = 0
+                self.power -= self.consumption*variable_consumption + self.consumption
                 if self.power < 0:
                     self.power = 0
             else:
                 self.reset_location()
         elif self.name == 'VENT':
-            pass
+            if self.power >= self.consumption:
+                if not self.functional:
+                    self.functional = True
+                variable_consumption = (self.rpm/1000) - 2.4
+                if variable_consumption < 0:
+                    variable_consumption = 0
+                self.power -= self.consumption*variable_consumption + self.consumption*self.VentNum
+                if self.power < 0:
+                    self.power = 0
+            else:
+                self.reset_location()
 
     def generate_resource(self):    #Method that generates the 'resources' of each specific location
         if self.functional:
@@ -357,7 +374,7 @@ class ModelLocation:
                 if self.AlertCounter['VENT NOT WORKING'] < 3:
                     self.generate_resource()
                 else:
-                    raise  MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
+                    raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
         else:
             raise FunctionalityError('CANT MINE IT WHEN IT IS NOT WORKING')
 
