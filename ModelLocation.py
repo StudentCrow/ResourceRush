@@ -237,7 +237,7 @@ class ModelLocation:
             elif self.name == 'CHIPSET':
                 pass
             elif self.name == 'GPU':
-                if self.AlertCounter['GRAPHICS NOT WORKING'] == 1 and bit.subsystem == True:  #If there is an error it starts fixing it
+                if self.AlertCounter['GRAPHICS NOT WORKING'] == 1 and bit.subsystem:  #If there is an error it starts fixing it
                     self.CustomAlertPercentage -= randrange(0, 4)   #Decreases the percentage of error left to fix in a random from 1 to 3
                     if self.CustomAlertPercentage < 0:
                         self.CustomAlertPercentage = 0
@@ -245,13 +245,28 @@ class ModelLocation:
                         self.AlertCounter['GRAPHICS NOT WORKING'] -= 1
                         bit.subsystem = False
                         bit.fixBool = False
-                elif self.AlertCounter['GRAPHICS NOT WORKING'] == 0 and bit.subsystem == True: #In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
+                elif self.AlertCounter['GRAPHICS NOT WORKING'] == 0 and bit.subsystem: #In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
                     bit.subsystem = False
                     bit.fixBool = False
                 else:   #If there is no active error it raises an error
                     raise InvalidFix('NO ERROR TO BE FIXED IN THIS LOCATION')
             elif self.name == 'VENT':
-                pass
+                if self.AlertCounter['VENT NOT WORKING'] > 0 and bit.subsystem:
+                    self.CustomAlertPercentage -= randrange(0, 4)
+                    if self.CustomAlertPercentage < 0:
+                        self.CustomAlertPercentage = 0
+                    if self.CustomAlertPercentage <= 200 and self.AlertCounter['VENT NOT WORKING'] == 3:
+                        self.AlertCounter['VENT NOT WORKING'] -= 1
+                    elif self.CustomAlertPercentage <= 100 and self.AlertCounter['VENT NOT WORKING'] == 2:
+                        self.AlertCounter['VENT NOT WORKING'] -= 1
+                    elif self.CustomAlertPercentage == 0 and self.AlertCounter['VENT NOT WORKING'] == 1:
+                        self.AlertCounter['VENT NOT WORKING'] -= 1
+                        bit.subsystem = False
+                        bit.fixBool = False
+                elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
+                    bit.subsystem = False
+                    bit.fixBool = False
+
         else:
             bit.subsystem = False
             bit.fixBool = False
