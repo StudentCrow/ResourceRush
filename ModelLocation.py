@@ -71,7 +71,7 @@ class ModelLocation:
         self.x = x
         self.y = y
 
-        #Different alerts depending on the location:
+        #Different alerts and variables depending on the location:
         if self.name == 'PERI':
             pass
         elif self.name == 'VRM':
@@ -167,8 +167,8 @@ class ModelLocation:
                     self.AlertCounter['TOO MUCH GRAPHICS'] -= 1
 
                 if self.graphics > 0.65 and self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Activates with a 15% chance the graphics not working error if graphic usage abive 65%
-                    error = random()
-                    if error > 0.85:
+                    error = round(random(), 2)
+                    if error > 0.85:    #15% chance for the error to trigger
                         self.AlertCounter['GRAPHICS NOT WORKING'] += 1
                         self.CustomAlertPercentage = 100
                         self.graphics = 0.0
@@ -184,8 +184,35 @@ class ModelLocation:
                     self.AlertCounter['LOW POWER'] += 1
                 elif self.power > 425.0 and self.AlertCounter['LOW POWER'] == 1:
                     self.AlertCounter['LOW POWER'] -= 1
+                ###
             elif self.name == 'VENT':
-                pass
+                ###
+                #Decrease of rpm
+                if self.rpm > 0:
+                    self.rpm -= 15.0*self.VentNum
+                    if self.rpm < 0:
+                        self.rpm = 0
+                ###
+                #Vent error
+                if self.VentNum > 0:    #A vent error can happen only if there is at least 1 vent working
+                    error = round(random(), 2)
+                    if error > 0.95:    #5% chance for the error to trigger
+                        self.AlertCounter['VENT NOT WORKING'] +=1
+                        self.VentNum -= 1.0
+                        self.CustomAlertPercentage += 100
+                ###
+                #Temperature error
+                if self.temperature >= -10 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < -10 and self.AlertCounter['HIGH TEMPERATURE'] ==1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -=1
+                ###
+                #Power error
+                if self.power <= 22.5 and self.AlertCounter['LOW POWER'] == 0:
+                    self.AlertCounter['LOW POWER'] += 1
+                elif self.power > 22.5 and self.AlertCounter['LOW POWER'] == 1:
+                    self.AlertCounter['LOW POWER'] -= 1
+                ###
         else:
             pass
 
@@ -371,7 +398,7 @@ class ModelLocation:
                 else:
                     raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
             elif self.name == 'VENT':
-                if self.AlertCounter['VENT NOT WORKING'] < 3:
+                if self.VentNum != 0:
                     self.generate_resource()
                 else:
                     raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
