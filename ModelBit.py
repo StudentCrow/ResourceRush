@@ -34,7 +34,7 @@ class ModelBit:
 
         self.name = name
         self.time = time    #Determines the remining lifetime of the bit
-        self.working = working  #Boolean that indicates if the bit is currently working or in standby
+        # self.working = working  #Boolean that indicates if the bit is currently working or in standby
         self.subsystem = subsystem  #Boolean that indicates if the bit is working in a subsystem or not
         self.critic = critic    #Boolean that indicates if the bit is in critic state or not
         self.loc = 'BIOS'   #Location where the bit is currently positionated
@@ -47,9 +47,11 @@ class ModelBit:
         self.FixCheck = fix
         self.MineCheck = mine
         self.MoveCheck = move
+        self.GetDestination = ''
+        self.StoreDestination = ''
 
         # List of hints of the orders a bit can get
-        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET', 'STORE', 'MOVE']
+        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET RESOURCE IN LOCATION', 'STORE RESOURCE IN LOCATION', 'MOVE RESOURCE FROM LOCATION TO LOCATION']
         # Complete orders that a bit can get:
         #    GO TO LOCATION, 3
         #    MINE, 1
@@ -125,7 +127,7 @@ class ModelBit:
                     if not self.GoToCheck and not self.MoveCheck:
                         GetReference = self.OrdList[3].split()
                         StoreReference = self.OrdList[4].split()
-                        if GetReference[0] == DecomposedOrd[0]: #The order is a get
+                        if GetReference[0] == DecomposedOrd[0] and GetReference[2] == DecomposedOrd[2]: #The order is a get
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
                                 raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
@@ -136,7 +138,7 @@ class ModelBit:
                                     self.MineCheck = False
                                     destination.give_power(self.name)
 
-                        elif StoreReference[0] == DecomposedOrd[0]: #The order is a store
+                        elif StoreReference[0] == DecomposedOrd[0] and StoreReference[2] == DecomposedOrd[2]: #The order is a store
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
                                 raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
@@ -149,7 +151,19 @@ class ModelBit:
                         else:
                             raise InvalidOrderError('INVALID ORDER')
                 case 5: #Case when the order is move
-                    pass
+                    reference = self.OrdList[5].split()
+                    if reference[0] == DecomposedOrd[0] and reference[2] == DecomposedOrd[2] and  reference[4] == DecomposedOrd[4]:
+                        get_destination = DecomposedOrd[3]
+                        store_destination = DecomposedOrd[5]
+                        if get_destination not in self.LocationListNames or store_destination not in self.LocationListNames:
+                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                        else:
+                            self.GetDestination = get_destination
+                            self.loc = get_destination
+                            self.StoreDestination = store_destination
+                            self.MoveCheck = True
+                    else:
+                        raise InvalidOrderError('INVALID ORDER')
                 case _: #Raises custom error
                     raise InvalidOrderError('INVALID ORDER')
         else:
@@ -188,8 +202,21 @@ class ModelBit:
         elif not self.MineCheck:
             print('Mine order has not been given yet')
 
-    def move(self, destination1, destination2): #Method that moves a bit from one place to another carrying power from 1 to 2
-        pass
+    def move(self, GetDestination, StoreDestination): #Method that moves a bit from one place to another carrying power from 1 to 2
+        if self.MoveCheck:
+            self.GoToCheck = True
+            if self.loc == GetDestination:  #Case when the bit is going to the location to get resources
+                self.go_to(GetDestination)
+                if not self.GoToCheck:
+                    GetDestination.give_power(self.name)
+                    self.loc = StoreDestination
+            elif self.loc == StoreDestination:  #Case when the bit is going to the location to store resources
+                self.go_to(StoreDestination)
+                if not self.GoToCheck:
+                    StoreDestination.get_power(self.name)
+                    self.loc = GetDestination
+        elif not self.MoveCheck:
+            print('Move order has not been given yet')
 
     def draw(self, surface): #Method to blit yourself at your current position
         surface.blit(self.image, (self.x, self.y))
