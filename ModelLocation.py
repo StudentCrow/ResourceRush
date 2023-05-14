@@ -99,7 +99,7 @@ class ModelLocation:
             self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'VENT NOT WORKING': 0}
             self.CustomAlertPercentage = 0
             self.VentNum = 3.0
-            self.rpm = 900.0*self.VentNum  # Average rpm from 800 to 1000
+            self.rpm = 0.0  # Average rpm from 800 to 1000
             self.consumption = 3.0*self.VentNum
 
     def reset_location(self):   #Method that resets everything for when it gets turned on or off
@@ -130,6 +130,9 @@ class ModelLocation:
             if self.AlertCounter['TOO MUCH GRAPHICS'] == 1:
                 self.AlertCounter['TOO MUCH GRAPHICS'] -= 1
         elif self.name == 'VENT':
+            self.functional= False
+            self.temperature = 0.0
+            self.rpm = 0.0
             pass
 
     def manage_alerts(self):    #Method that generates alerts when the conditions are met
@@ -316,7 +319,12 @@ class ModelLocation:
                         if self.graphics >= 1:
                             self.graphics += round(uniform(0.0, 0.03),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
             elif self.name == 'VENT':
-                pass
+                if self.rpm < 2400.0:
+                    self.rpm += 50*self.VentNum
+                else:
+                    self.rpm += 10*self.VentNum
+                if self.rpm > 3000.0:
+                    self.rpm = 3000.0
         else:
             pass
 
@@ -346,7 +354,10 @@ class ModelLocation:
                 else:
                     raise MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
             elif self.name == 'VENT':
-                pass
+                if self.AlertCounter['VENT NOT WORKING'] < 3:
+                    self.generate_resource()
+                else:
+                    raise  MiningError('MINING IS NOT POSSIBLE IN GPU RIGHT NOW')
         else:
             raise FunctionalityError('CANT MINE IT WHEN IT IS NOT WORKING')
 
