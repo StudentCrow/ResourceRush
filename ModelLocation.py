@@ -193,7 +193,15 @@ class ModelLocation:
                     self.AlertCounter['LOW POWER'] -= 1
                 ###
             elif self.name == 'VRM':
-                pass
+                ###
+                #Random VRM error
+                if self.refined_power > 500 and self.AlertCounter['VRM NOT WORKING'] == 0:
+                    error = round(random(), 2)
+                    if error > 0.95:    #5% chance for the error to trigger
+                        self.AlertCounter['VRM NOT WORKING'] += 1
+                        self.refined_power = 0.0
+                ###
+                #Temperature error
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
