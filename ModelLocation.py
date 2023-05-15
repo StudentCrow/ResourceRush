@@ -77,7 +77,8 @@ class ModelLocation:
             self.PeriNum = 4.0  #Each peripheral can only go up to 10ºC, 40ºC
             self.consumption = 10.0 #Consumption per peripheral
         elif self.name == 'VRM':
-            pass
+            self.AlertCounter = {'HIGH TEMPERATURE': 0, 'TOO MUCH REFINED POWER': 0, 'VRM NOT WORKING': 0}
+            self.refined_power = 0.0
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':
@@ -116,7 +117,16 @@ class ModelLocation:
             if self.AlertCounter['HIGH TEMPERATURE'] == 1:
                 self.AlertCounter['HIGH TEMPERATURE'] -= 1
         elif self.name == 'VRM':
-            pass
+            self.functional = False
+            self.refined_power = 0.0
+            self.temperature = 0.0
+            if self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                self.AlertCounter['HIGH TEMPERATURE'] -= 1
+            if self.AlertCounter['TOO MUCH REFINED POWER'] == 1:
+                self.AlertCounter['TOO MUCH REFINED POWER'] -= 1
+            if self.AlertCounter['VRM NOT WORKING'] == 1:
+                self.AlertCounter['VRM NOT WORKING'] -= 1
+                self.custom_alert(ModelBit.)
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':
