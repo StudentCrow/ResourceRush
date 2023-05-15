@@ -90,7 +90,7 @@ class ModelLocation:
             self.CustomAlertPercentage = 0
             self.BitBuilding = 0.0
         elif self.name == 'CHIPSET':
-            self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0}
+            self.AlertCounter = {'LOW CHIPSET OUTPUT': 0, 'LOW POWER': 0, 'HIGH TEMPERATURE': 0}
             self.chipset_power = 0.0
             self.consumption = 8.55
         elif self.name == 'GPU':
@@ -168,11 +168,23 @@ class ModelLocation:
                 ###
             elif self.name == 'CHIPSET':
                 ###
+                #Chipset output error
+                if self.chipset_power <= 30.0 and self.AlertCounter['LOW CHIPSET OUTPUT'] == 0:
+                    self.AlertCounter['LOW CHIPSET OUTPUT'] += 1
+                elif self.chipset_power > 30.0 and self.AlertCounter['LOW CHIPSET OUTPUT'] == 1:
+                    self.AlertCounter['LOW CHIPSET OUTPUT'] -= 1
+                ###
                 #Temperature error
                 if self.temperature >= 55.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
                     self.AlertCounter['HIGH TEMPERATURE'] += 1
                 elif self.temperature < 55.0 and self.AlertCounter['HIGH TEMPERATURE'] == 1:
                     self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
+                #Power error
+                if self.power <= 21.38 and self.AlertCounter['LOW POWER'] == 0:
+                    self.AlertCounter['LOW POWER'] += 1
+                elif self.power > 21.38 and self.AlertCounter['LOW POWER'] == 1:
+                    self.AlertCounter['LOW POWER'] -= 1
                 ###
             elif self.name == 'GPU':
                 ###
