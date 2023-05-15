@@ -29,6 +29,7 @@ class ModelBit:
     """
     counter = 0 #Counts the number of bits existing
     kill_counter = 0 #Counts which was the last bit to die
+    instances = [] #Saves the instances of ModelBit
 
     def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
                  subsystem=False, critic=False, load=0.0, goto=False, fix=False,
@@ -80,6 +81,8 @@ class ModelBit:
         for i in self.LocationList:
             self.LocationListNames.append(i.name)
         #['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
+
+        self.__class__.instances.append(self)
 
     #Function that checks if an order is real and calls for the correct method
     def receive_order(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder

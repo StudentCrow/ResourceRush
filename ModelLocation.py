@@ -78,6 +78,7 @@ class ModelLocation:
             self.consumption = 10.0 #Consumption per peripheral
         elif self.name == 'VRM':
             self.AlertCounter = {'HIGH TEMPERATURE': 0, 'TOO MUCH REFINED POWER': 0, 'VRM NOT WORKING': 0}
+            self.CustomAlertPercentage = 0
             self.refined_power = 0.0
         elif self.name == 'RAM':
             pass
@@ -125,8 +126,12 @@ class ModelLocation:
             if self.AlertCounter['TOO MUCH REFINED POWER'] == 1:
                 self.AlertCounter['TOO MUCH REFINED POWER'] -= 1
             if self.AlertCounter['VRM NOT WORKING'] == 1:
+                self.CustomAlertPercentage = 0
                 self.AlertCounter['VRM NOT WORKING'] -= 1
-                self.custom_alert(ModelBit.)
+                for i in ModelBit.instances:
+                    if i.loc == self.name and i.subsystem:
+                        i.subsystem = False
+                        i.FixCheck = False
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':
@@ -315,10 +320,10 @@ class ModelLocation:
                         self.AlertCounter['PERIPHERAL NOT WORKING'] -= 1
                         self.PeriNum += 1.0
                         bit.subsystem = False
-                        bit.fixBool = False
+                        bit.FixCheck = False
                 elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -326,7 +331,7 @@ class ModelLocation:
             elif self.name == 'ATX':    #Does not have custom alert
                 if bit.subsystem:
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
             elif self.name == 'CPU':
                 pass
             elif self.name == 'DISK':
@@ -341,14 +346,14 @@ class ModelLocation:
                     if self.CustomAlertPercentage == 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
                         self.AlertCounter['BIOS NOT WORKING'] -= 1
                         bit.subsystem = False
-                        bit.fixBool = False
+                        bit.FixCheck = False
                 elif self.AlertCounter['BIOS NOT WORKING'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
             elif self.name == 'CHIPSET':    #Does not have custom alert
                 if bit.subsystem:
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
             elif self.name == 'GPU':
                 if self.AlertCounter['GRAPHICS NOT WORKING'] == 1 and bit.subsystem:  #If there is an error it starts fixing it
                     self.CustomAlertPercentage -= randrange(0, 4)   #Decreases the percentage of error left to fix in a random from 1 to 3
@@ -357,10 +362,10 @@ class ModelLocation:
                     if self.CustomAlertPercentage == 0: #If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
                         self.AlertCounter['GRAPHICS NOT WORKING'] -= 1
                         bit.subsystem = False
-                        bit.fixBool = False
+                        bit.FixCheck = False
                 elif self.AlertCounter['GRAPHICS NOT WORKING'] == 0 and bit.subsystem: #In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
                 else:   #If there is no active error it raises an error
                     raise InvalidFix('NO ERROR TO BE FIXED IN THIS LOCATION')
             elif self.name == 'VENT':
@@ -378,13 +383,13 @@ class ModelLocation:
                         self.AlertCounter['VENT NOT WORKING'] -= 1
                         self.VentNum += 1.0
                         bit.subsystem = False
-                        bit.fixBool = False
+                        bit.FixCheck = False
                 elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
                     bit.subsystem = False
-                    bit.fixBool = False
+                    bit.FixCheck = False
         else:
             bit.subsystem = False
-            bit.fixBool = False
+            bit.FixCheck = False
             raise FunctionalityError('CANT FIX SOMETHING THAT IS NOT WORKING')
 
     def temp_increase(self): #Method to calculate how much temperature does the location have
