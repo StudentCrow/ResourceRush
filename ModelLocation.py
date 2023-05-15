@@ -81,7 +81,8 @@ class ModelLocation:
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':
-            pass
+            self.AlertCounter = {'TOO MUCH STORED POWER': 0}
+            self.stored_power = 0.0
         elif self.name == 'CPU':
             pass
         elif self.name == 'DISK':
@@ -89,7 +90,7 @@ class ModelLocation:
         elif self.name == 'CLK':    #Let's you slow down time, let it for the last one as it will be linked with the control of time
             pass
         elif self.name == 'BIOS': #Bios should be always functional
-            self.AlertCounter = {'BIOS NOT WORKING' : 0}
+            self.AlertCounter = {'BIOS NOT WORKING': 0}
             self.CustomAlertPercentage = 0
             self.BitBuilding = 0.0
         elif self.name == 'CHIPSET':
@@ -119,7 +120,9 @@ class ModelLocation:
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':
-            pass
+            self.stored_power = 0.0
+            if self.AlertCounter['TOO MUCH STORED POWER'] == 1:
+                self.AlertCounter['TOO MUCH STORED POWER'] -= 1
         elif self.name == 'CPU':
             pass
         elif self.name == 'DISK':
@@ -179,7 +182,13 @@ class ModelLocation:
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
-                pass
+                ###
+                #Stored power error
+                if self.stored_power >= 3500.0 and self.AlertCounter['TOO MUCH STORED POWER'] == 0:
+                    self.AlertCounter['TOO MUCH STORED POWER'] += 1
+                elif self.stored_power < 3500.0 and self.AlertCounter['TOO MUCH STORED POWER'] == 1:
+                    self.AlertCounter['TOO MUCH STORED POWER'] -= 1
+                ###
             elif self.name == 'CPU':
                 pass
             elif self.name == 'DISK':
@@ -304,8 +313,10 @@ class ModelLocation:
                 pass
             elif self.name == 'RAM':
                 pass
-            elif self.name == 'ATX':
-                pass
+            elif self.name == 'ATX':    #Does not have custom alert
+                if bit.subsystem:
+                    bit.subsystem = False
+                    bit.fixBool = False
             elif self.name == 'CPU':
                 pass
             elif self.name == 'DISK':
@@ -378,7 +389,7 @@ class ModelLocation:
                 pass
             elif self.name == 'RAM':
                 pass
-            elif self.name == 'ATX':
+            elif self.name == 'ATX':    #Does not generate temperature
                 pass
             elif self.name == 'CPU':
                 pass
@@ -424,14 +435,15 @@ class ModelLocation:
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':    #Does not consume power, it generates it
-            pass
+            if self.stored_power > 4500.0:
+                self.reset_location()
         elif self.name == 'CPU':
             pass
         elif self.name == 'DISK':
             pass
         elif self.name == 'CLK':
             pass
-        elif self.name == 'BIOS': #Does not naturally consume power
+        elif self.name == 'BIOS':   #Does not naturally consume power
             pass
         elif self.name == 'CHIPSET':
             if self.power >= self.consumption and self.temperature <= 65.0:
@@ -477,7 +489,7 @@ class ModelLocation:
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
-                pass
+                self.stored_power += round(uniform(10.0, 15.0), 2)
             elif self.name == 'CPU':
                 pass
             elif self.name == 'DISK':
@@ -521,7 +533,7 @@ class ModelLocation:
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
-                pass
+                self.generate_resource()
             elif self.name == 'CPU':
                 pass
             elif self.name == 'DISK':
