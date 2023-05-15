@@ -233,9 +233,9 @@ class ModelLocation:
                         self.CustomAlertPercentage += 100
                 ###
                 #Temperature error
-                if self.temperature >= -10 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                if self.temperature >= -10.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
                     self.AlertCounter['HIGH TEMPERATURE'] += 1
-                elif self.temperature < -10 and self.AlertCounter['HIGH TEMPERATURE'] ==1:
+                elif self.temperature < -10.0 and self.AlertCounter['HIGH TEMPERATURE'] ==1:
                     self.AlertCounter['HIGH TEMPERATURE'] -=1
                 ###
                 #Power error
@@ -333,22 +333,22 @@ class ModelLocation:
             elif self.name == 'BIOS':
                 self.temperature = self.power*0.1
             elif self.name == 'CHIPSET':
-                if self.temperature <= 30:
-                    self.temperature += 1
+                if self.chipset_power <= 40.0:
+                    self.temperature += 1.0
                 else:
-                    pass
+                    self.temperature = self.consumption*((self.chipset_power/100.0) + 1.59) + 30.0
             elif self.name == 'GPU':
                 if self.graphics <= 0.89:
-                    if self.temperature < 75:
-                        self.temperature += 1
+                    if self.temperature < 75.0:
+                        self.temperature += 1.0
                 else:
-                    self.temperature = self.consumption*(self.graphics - 0.89) + 75
+                    self.temperature = self.consumption*(self.graphics - 0.89) + 75.0
             elif self.name == 'VENT':
                 if self.rpm <= 2400.0:
-                    if self.temperature > -30:
-                        self.temperature -= 1
+                    if self.temperature > -30.0:
+                        self.temperature -= 1.0
                 else:
-                    self.temperature = -(self.consumption*(3.6 + self.rpm) + 30)
+                    self.temperature = -(self.consumption*(3.6 + self.rpm) + 30.0)
         else:
             pass
 
