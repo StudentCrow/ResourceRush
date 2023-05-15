@@ -74,8 +74,8 @@ class ModelLocation:
         if self.name == 'PERI':
             self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'PERIPHERAL NOR WORKING': 0}
             self.CustomAlertPercentage = 0
-            self.PeriNum = 4.0
-
+            self.PeriNum = 4.0  #Each peripheral can only go up to 10ºC, 40ºC
+            self.consumption = 10.0 #Consumption per peripheral
         elif self.name == 'VRM':
             pass
         elif self.name == 'RAM':
@@ -106,11 +106,14 @@ class ModelLocation:
             self.CustomAlertPercentage = 0
             self.VentNum = 3.0
             self.rpm = 0.0  # Average rpm from 800 to 1000
-            self.consumption = 3.0
+            self.consumption = 3.0  #Consumption per vent
 
     def reset_location(self):   #Method that resets everything for when it gets turned on or off
         if self.name == 'PERI':
-            pass
+            self.functional = False
+            self.temperature = 0.0
+            if self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                self.AlertCounter['HIGH TEMPERATURE'] -= 1
         elif self.name == 'VRM':
             pass
         elif self.name == 'RAM':
@@ -147,7 +150,30 @@ class ModelLocation:
     def manage_alerts(self):    #Method that generates alerts when the conditions are met
         if self.functional:
             if self.name == 'PERI':
-                pass
+                ###
+                #Consume of chipset power
+                self.generate_resource()
+                ###
+                #Random peripheral error
+                if self.PeriNum > 0 and CHIPSET.chipset_power < 25.0:    #A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
+                    error = round(random(), 2)
+                    if error > 0.95:    #There's 5% chance of it triggering
+                        self.AlertCounter['PERIPHERAL NOT WORKING'] += 1
+                        self.PeriNum -= 1.0
+                        self.CustomAlertPercentage += 100
+                ###
+                #Temperature error
+                if self.temperature >= 5.0*self.PeriNum and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < 5.0*self.PeriNum and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
+                #Power error
+                if self.power <= 100.0 and self.AlertCounter['LOW POWER'] == 0:
+                    self.AlertCounter['LOW POWER'] += 1
+                elif self.power > 100.0 and self.AlertCounter['LOW POWER'] == 1:
+                    self.AlertCounter['LOW POWER'] -= 1
+                ###
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -253,7 +279,27 @@ class ModelLocation:
     def custom_alert(self, bit): #Method that fixes the alerts that are not value dependant
         if self.functional:
             if self.name == 'PERI':
-                pass
+                if self.AlertCounter['PERIPHERAL NOT WORKING'] > 0 and bit.subsystem:
+                    self.CustomAlertPercentage -= randrange(0, 4)
+                    if self.CustomAlertPercentage < 0:
+                        self.CustomAlertPercentage = 0
+                    if self.CustomAlertPercentage <= 300 and self.AlertCounter['PERIPHERAL NOT WORKING'] == 4:
+                        self.AlertCounter['PERIPHERAL NOT WORKING'] -= 1
+                        self.PeriNum += 1.0
+                    elif self.CustomAlertPercentage == 0 and self.AlertCounter['VENT NOT WORKING'] == 3:
+                        self.AlertCounter['PERIPHERAL NOT WORKING'] -= 1
+                        self.PeriNum += 1.0
+                    elif self.CustomAlertPercentage <= 100 and self.AlertCounter['VENT NOT WORKING'] == 2:
+                        self.AlertCounter['PERIPHERAL NOT WORKING'] -= 1
+                        self.PeriNum += 1.0
+                    elif self.CustomAlertPercentage == 0 and self.AlertCounter['VENT NOT WORKING'] == 1:
+                        self.AlertCounter['PERIPHERAL NOT WORKING'] -= 1
+                        self.PeriNum += 1.0
+                        bit.subsystem = False
+                        bit.fixBool = False
+                elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
+                    bit.subsystem = False
+                    bit.fixBool = False
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -303,10 +349,13 @@ class ModelLocation:
                         self.CustomAlertPercentage = 0
                     if self.CustomAlertPercentage <= 200 and self.AlertCounter['VENT NOT WORKING'] == 3:
                         self.AlertCounter['VENT NOT WORKING'] -= 1
+                        self.VentNum += 1.0
                     elif self.CustomAlertPercentage <= 100 and self.AlertCounter['VENT NOT WORKING'] == 2:
                         self.AlertCounter['VENT NOT WORKING'] -= 1
+                        self.VentNum += 1.0
                     elif self.CustomAlertPercentage == 0 and self.AlertCounter['VENT NOT WORKING'] == 1:
                         self.AlertCounter['VENT NOT WORKING'] -= 1
+                        self.VentNum += 1.0
                         bit.subsystem = False
                         bit.fixBool = False
                 elif self.AlertCounter['VENT NOT WORKING'] == 0 and bit.subsystem:
@@ -320,7 +369,11 @@ class ModelLocation:
     def temp_increase(self): #Method to calculate how much temperature does the location have
         if self.functional:
             if self.name == 'PERI':
-                pass
+                if CHIPSET.chipset_power > 0.0:
+                    if self.temperature < 5.0*self.PeriNum:
+                        self.temperature += 0.2
+                else:
+                    self.temperature = 10.0*self.PeriNum
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -357,12 +410,20 @@ class ModelLocation:
 
     def power_management(self):    #Method to calculate how much power the location has each second
         if self.name == 'PERI':
-            pass
+            if self.power >= self.consumption*self.PeriNum:
+                if not self.functional:
+                    self.functional = True
+                variable_consumption = (1.0 - (CHIPSET.chipset_power/100))
+                if variable_consumption < 0:
+                    variable_consumption = 0
+                self.power -= (self.consumption*variable_consumption)*self.PeriNum + self.consumption*self.PeriNum
+            else:
+                self.reset_location()
         elif self.name == 'VRM':
             pass
         elif self.name == 'RAM':
             pass
-        elif self.name == 'ATX':
+        elif self.name == 'ATX':    #Does not consume power, it generates it
             pass
         elif self.name == 'CPU':
             pass
@@ -395,7 +456,7 @@ class ModelLocation:
             else:
                 self.reset_location()
         elif self.name == 'VENT':
-            if self.power >= self.consumption:
+            if self.power >= self.consumption*self.VentNum:
                 if not self.functional:
                     self.functional = True
                 variable_consumption = (self.rpm/1000) - 2.4
@@ -410,7 +471,7 @@ class ModelLocation:
     def generate_resource(self):    #Method that generates the 'resources' of each specific location
         if self.functional:
             if self.name == 'PERI':
-                pass
+                CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.PeriNum
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -454,7 +515,7 @@ class ModelLocation:
     def get_mined(self, bit):    #Method for when it is mined by a bit
         if self.functional:
             if self.name == 'PERI':
-                pass
+                raise MiningError('PERIPHERALS CANT BE MINED')
             elif self.name == 'VRM':
                 pass
             elif self.name == 'RAM':
@@ -495,4 +556,4 @@ class ModelLocation:
     def give_power(self, bit):  #Method for when a bit gets power from a location
         charge = bit.limit - bit.load
         self.power -= charge
-        bit.load = bit.limit
+        bit.load += charge
