@@ -72,7 +72,10 @@ class ModelLocation:
 
         #Different alerts and variables depending on the location:
         if self.name == 'PERI':
-            pass
+            self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'PERIPHERAL NOR WORKING': 0}
+            self.CustomAlertPercentage = 0
+            self.PeriNum = 4.0
+
         elif self.name == 'VRM':
             pass
         elif self.name == 'RAM':
@@ -83,7 +86,7 @@ class ModelLocation:
             pass
         elif self.name == 'DISK':
             pass
-        elif self.name == 'CLK':
+        elif self.name == 'CLK':    #Let's you slow down time, let it for the last one as it will be linked with the control of time
             pass
         elif self.name == 'BIOS': #Bios should be always functional
             self.AlertCounter = {'BIOS NOT WORKING' : 0}
@@ -370,7 +373,15 @@ class ModelLocation:
         elif self.name == 'BIOS': #Does not naturally consume power
             pass
         elif self.name == 'CHIPSET':
-            pass
+            if self.power >= self.consumption and self.temperature <= 65.0:
+                if not self.functional:
+                    self.functional = True
+                variable_consumption = (self.chipset_power/100) - 1.5
+                if  variable_consumption < 0:
+                    variable_consumption = 0
+                self.power -= self.consumption*variable_consumption + self.consumption
+            else:
+                self.reset_location()
         elif self.name == 'GPU':
             if self.power >= self.consumption:
                 if not self.functional:
@@ -423,13 +434,13 @@ class ModelLocation:
                     new_bit = 'Bit'+bit_name+'=ModelBit('+bit_name+'locations)' #Hace falta revisar esto cuando se tenga la version final
                     exec(new_bit)
             elif self.name == 'CHIPSET':
-                pass
+                self.chipset_power += round(uniform(0.0, 3.0), 2)
             elif self.name == 'GPU':
                 if self.AlertCounter['GRAPHICS NOT WORKING'] == 0: #Graphics only increase if working
                     if self.graphics < 1:
-                        self.graphics += round(uniform(0.0, 0.1),2)
+                        self.graphics += round(uniform(0.0, 0.1), 2)
                         if self.graphics >= 1:
-                            self.graphics += round(uniform(0.0, 0.03),2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
+                            self.graphics += round(uniform(0.0, 0.03), 2)    #Graphic usage rises slower because it will generate too much heat, aka, temperature error
             elif self.name == 'VENT':
                 if self.rpm < 2400.0:
                     self.rpm += 50*self.VentNum
@@ -462,7 +473,7 @@ class ModelLocation:
                 else:
                     raise MiningError('MINING IS NOT POSSIBLE IN BIOS RIGHT NOW')
             elif self.name == 'CHIPSET':
-                pass
+                self.generate_resource()
             elif self.name == 'GPU':    #In GPU case, its graphic usage must be reduced
                 if self.AlertCounter['GRAPHICS NOT WORKING'] == 0:
                     self.graphics -= round(uniform(0.005, 0.03), 2)
