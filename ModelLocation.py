@@ -195,13 +195,21 @@ class ModelLocation:
             elif self.name == 'VRM':
                 ###
                 #Random VRM error
-                if self.refined_power > 500 and self.AlertCounter['VRM NOT WORKING'] == 0:
+                if self.refined_power > 500.0 and self.AlertCounter['VRM NOT WORKING'] == 0:
                     error = round(random(), 2)
                     if error > 0.95:    #5% chance for the error to trigger
                         self.AlertCounter['VRM NOT WORKING'] += 1
                         self.refined_power = 0.0
                 ###
-                #Temperature error
+                #Temperature error, at 120ºC it resets
+                if self.temperature >= 90.0*self.PeriNum and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < 90.0*self.PeriNum and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
+                #Refined power error
+
+                ###
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
@@ -454,7 +462,11 @@ class ModelLocation:
             else:
                 self.reset_location()
         elif self.name == 'VRM':
-            pass
+            if self.temperature < 120.0 and self.refined_power < 1000.0:
+                if not self.functional:
+                    self.functional = True
+            else:
+                self.reset_location()
         elif self.name == 'RAM':
             pass
         elif self.name == 'ATX':    #Does not consume power, it generates it
