@@ -34,8 +34,6 @@ class ModelBit:
     def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
                  subsystem=False, critic=False, load=0.0, goto=False, fix=False,
                  mine=False, move=False):
-        # self.image = pygame.image.load(img_path)    Load sprite
-
         ModelBit.counter += 1
 
         self.name = name
@@ -225,9 +223,6 @@ class ModelBit:
                     self.loc = GetDestination
         elif not self.MoveCheck:
             print('Move order has not been given yet')
-
-    def draw(self, surface): #Method to blit yourself at your current position
-        surface.blit(self.image, (self.x, self.y))
 
 def main():
     """Pruebas funcionamiento de órden go to"""
