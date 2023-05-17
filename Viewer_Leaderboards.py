@@ -1,4 +1,4 @@
-from Colors import *
+from Resources import *
 from Viewer_Menu import *
 from Model_Leaderboards import *
 import pygame
