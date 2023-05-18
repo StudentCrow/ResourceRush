@@ -1,4 +1,4 @@
-# modelo para insertar el nombre una vez se clique en new mission
+# modelo para insertar el nombre una vez se clique en new mission TODO falta acabar
 import pygame
 import pygame_gui
 from Viewer_Menu import *

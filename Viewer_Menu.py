@@ -1,5 +1,5 @@
 import pygame, sys
-from Resources import *
+from Imports import *
 pygame.init()
 
 WIDTH = 1000

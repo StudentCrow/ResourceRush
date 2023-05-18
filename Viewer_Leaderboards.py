@@ -1,4 +1,5 @@
-from Resources import *
+# TODO hay que hacer bien los vectores (lista de listas) para asociar los scores con los names
+from Imports import *
 from Viewer_Menu import *
 from Model_Leaderboards import *
 import pygame

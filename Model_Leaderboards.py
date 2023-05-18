@@ -1,6 +1,6 @@
 import pygame
 import sys
-from Resources import *
+from Imports import *
 from Viewer_Menu import *
 from Viewer_Leaderboards import *
 
