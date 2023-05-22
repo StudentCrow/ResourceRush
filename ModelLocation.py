@@ -200,6 +200,7 @@ class ModelLocation:
                     if error > 0.95:    #5% chance for the error to trigger
                         self.AlertCounter['VRM NOT WORKING'] += 1
                         self.refined_power = 0.0
+                        self.CustomAlertPercentage = 100
                 ###
                 #Temperature error, at 120ºC it resets
                 if self.temperature >= 90.0*self.PeriNum and self.AlertCounter['HIGH TEMPERATURE'] == 0:
@@ -208,7 +209,10 @@ class ModelLocation:
                     self.AlertCounter['HIGH TEMPERATURE'] -= 1
                 ###
                 #Refined power error
-
+                if self.refined_power >= 800.0 and self.AlertCounter['TOO MUCH REFINED POWER'] == 0:
+                    self.AlertCounter['TOO MUCH REFINED POWER'] += 1
+                elif self.refined_power < 800.0 and self.AlertCounter['TOO MUCH REFINED POWER'] == 1:
+                    self.AlertCounter['TOO MUCH REFINED POWER'] -= 1
                 ###
             elif self.name == 'RAM':
                 pass
@@ -224,7 +228,7 @@ class ModelLocation:
                 pass
             elif self.name == 'DISK':
                 pass
-            elif self.name == 'CLK':
+            elif self.name == 'CLK':    #Pass por ahora
                 pass
             elif self.name == 'BIOS':
                 ###
@@ -341,7 +345,17 @@ class ModelLocation:
                     bit.subsystem = False
                     bit.FixCheck = False
             elif self.name == 'VRM':
-                pass
+                if self.AlertCounter['VRM NOT WORKING'] == 1 and bit.subsystem:
+                    self.CustomAlertPercentage -= randrange(0, 4)
+                    if self.CustomAlertPercentage < 0:
+                        self.CustomAlertPercentage = 0
+                    if self.CustomAlertPercentage == 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
+                        self.AlertCounter['VRM NOT WORKING'] -= 1
+                        bit.subsystem = False
+                        bit.FixCheck = False
+                elif self.AlertCounter['VRM NOT WORKING'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
+                    bit.subsystem = False
+                    bit.FixCheck = False
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':    #Does not have custom alert
@@ -417,7 +431,10 @@ class ModelLocation:
                 else:
                     self.temperature = 10.0*self.PeriNum
             elif self.name == 'VRM':
-                pass
+                if self.refined_power <= 100.0 and self.temperature < 60:
+                    self.temperature += 1.0
+                elif self.refined_power > 100.0:
+                    self.temperature = 10.0*(6.0*(self.refined_power/1000.0)) + 60.0
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':    #Does not generate temperature
@@ -462,7 +479,7 @@ class ModelLocation:
             else:
                 self.reset_location()
         elif self.name == 'VRM':
-            if self.temperature < 120.0 and self.refined_power < 1000.0:
+            if self.temperature < 120.0:
                 if not self.functional:
                     self.functional = True
             else:
@@ -520,7 +537,8 @@ class ModelLocation:
             if self.name == 'PERI':
                 CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.PeriNum
             elif self.name == 'VRM':
-                pass
+                if self.power >= 100.0:
+                    self.power -= 100; self.refined_power += 10
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
@@ -564,7 +582,7 @@ class ModelLocation:
             if self.name == 'PERI':
                 raise MiningError('PERIPHERALS CANT BE MINED')
             elif self.name == 'VRM':
-                pass
+                self.generate_resource()
             elif self.name == 'RAM':
                 pass
             elif self.name == 'ATX':
