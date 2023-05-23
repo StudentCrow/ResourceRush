@@ -81,12 +81,18 @@ class ModelLocation:
             self.CustomAlertPercentage = 0
             self.refined_power = 0.0
         elif self.name == 'RAM':
-            pass
+            self.AlertCounter = {'LOW POWER': 0, 'HIGH TEMPERATURE': 0, 'LOW AVAILABLE RAM': 0}
+            self.available_ram = 16.0
+            self.ram_in_use = 0.0
+            self.consumption = 5.0
         elif self.name == 'ATX':
             self.AlertCounter = {'TOO MUCH STORED POWER': 0}
             self.stored_power = 0.0
         elif self.name == 'CPU':
-            pass
+            self.AlertCounter = {'LOW REFINED POWER': 0, 'HIGH TEMPERATURE': 0, 'TOO MANY PROCESSES': 0}
+            self.refined_power = 0.0
+            self.processes = 0.0
+            self.consumption = 20.0
         elif self.name == 'DISK':
             pass
         elif self.name == 'CLK':    #Let's you slow down time, let it for the last one as it will be linked with the control of time
@@ -133,13 +139,19 @@ class ModelLocation:
                         i.subsystem = False
                         i.FixCheck = False
         elif self.name == 'RAM':
-            pass
+            self.functional = False
+            self.temperature = 0.0
+            self.available_ram = 16.0
+            self.ram_in_use = 0.0
+            self.manage_alerts()
         elif self.name == 'ATX':
             self.stored_power = 0.0
             if self.AlertCounter['TOO MUCH STORED POWER'] == 1:
                 self.AlertCounter['TOO MUCH STORED POWER'] -= 1
         elif self.name == 'CPU':
-            pass
+            self.functional = False
+            self.temperature = 0.0
+            self.manage_alerts()
         elif self.name == 'DISK':
             pass
         elif self.name == 'CLK':
@@ -215,7 +227,28 @@ class ModelLocation:
                     self.AlertCounter['TOO MUCH REFINED POWER'] -= 1
                 ###
             elif self.name == 'RAM':
-                pass
+                ###
+                #Random use of ram
+                self.generate_resource()
+                ###
+                #Ram error
+                if self.available_ram <= 2.0 and self.AlertCounter['LOW AVAILABLE RAM'] == 0:
+                    self.AlertCounter['LOW AVAILABLE RAM'] += 1
+                elif self.available_ram > 2.0 and self.AlertCounter['LOW AVAILABLE RAM'] == 1:
+                    self.AlertCounter['LOW AVAILABLE RAM'] -= 1
+                ###
+                #Temperature error
+                if self.temperature >= 70.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < 70.0 and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
+                #Power error
+                if self.power <= 12.5 and self.AlertCounter['LOW POWER'] == 0:
+                    self.AlertCounter['LOW POWER'] += 1
+                elif self.power > 12.5 and self.AlertCounter['LOW POWER'] == 1:
+                    self.AlertCounter['LOW POWER'] -= 1
+                ###
             elif self.name == 'ATX':
                 ###
                 #Stored power error
@@ -225,7 +258,27 @@ class ModelLocation:
                     self.AlertCounter['TOO MUCH STORED POWER'] -= 1
                 ###
             elif self.name == 'CPU':
-                pass
+                ###
+                #Random processes increase
+                self.generate_resource()
+                ###
+                #Processes error
+                if self.processes >= 90.0 and self.AlertCounter['TOO MANY PROCESSES'] == 0:
+                    self.AlertCounter['TOO MANY PROCESSES'] += 1
+                elif self.processes < 90.0 and self.AlertCounter['TOO MANY PROCESSES'] == 1:
+                    self.AlertCounter['TOO MANY PROCESSES'] -= 1
+                ###
+                #Temperature error
+                if self.temperature >= 45.0 and self.AlertCounter['HIGH TEMPERATURE'] == 0:
+                    self.AlertCounter['HIGH TEMPERATURE'] += 1
+                elif self.temperature < 45.0 and self.AlertCounter['HIGH TEMPERATURE'] == 1:
+                    self.AlertCounter['HIGH TEMPERATURE'] -= 1
+                ###
+                #Power error
+                if self.refined_power <= 50 and self.AlertCounter['LOW REFINED POWER'] == 0:
+                    self.AlertCounter['LOW REFINED POWER'] += 1
+                elif self.refined_power > 50 and self.AlertCounter['LOW REFINED POWER'] == 1:
+                    self.AlertCounter['LOW REFINED POWER'] -= 1
             elif self.name == 'DISK':
                 pass
             elif self.name == 'CLK':    #Pass por ahora
@@ -356,14 +409,18 @@ class ModelLocation:
                 elif self.AlertCounter['VRM NOT WORKING'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
                     bit.subsystem = False
                     bit.FixCheck = False
-            elif self.name == 'RAM':
-                pass
+            elif self.name == 'RAM':    #Does not have custom alert
+                if bit.subsystem:
+                    bit.subsystem = False
+                    bit.FixCheck = False
             elif self.name == 'ATX':    #Does not have custom alert
                 if bit.subsystem:
                     bit.subsystem = False
                     bit.FixCheck = False
-            elif self.name == 'CPU':
-                pass
+            elif self.name == 'CPU':    #Does not have custom alert
+                if bit.subsystem:
+                    bit.subsystem = False
+                    bit.FixCheck = False
             elif self.name == 'DISK':
                 pass
             elif self.name == 'CLK':
@@ -431,16 +488,22 @@ class ModelLocation:
                 else:
                     self.temperature = 10.0*self.PeriNum
             elif self.name == 'VRM':
-                if self.refined_power <= 100.0 and self.temperature < 60:
+                if self.refined_power <= 100.0 and self.temperature < 60.0:
                     self.temperature += 1.0
                 elif self.refined_power > 100.0:
                     self.temperature = 10.0*(6.0*(self.refined_power/1000.0)) + 60.0
             elif self.name == 'RAM':
-                pass
+                if self.ram_in_use <= 2.0 and self.temperature < 40.0:
+                    self.temperature += 1.0
+                elif self.ram_in_use > 2.0:
+                    self.temperature = self.consumption*(5.125*(self.ram_in_use/10)) + 40
             elif self.name == 'ATX':    #Does not generate temperature
                 pass
             elif self.name == 'CPU':
-                pass
+                if self.processes <= 20.0 and self.temperature < 30.0:
+                    self.temperature += 1.0
+                elif self.processes > 20.0:
+                    self.temperature = self.consumption*(1*(self.processes/100)) + 30
             elif self.name == 'DISK':
                 pass
             elif self.name == 'CLK':
@@ -485,12 +548,22 @@ class ModelLocation:
             else:
                 self.reset_location()
         elif self.name == 'RAM':
-            pass
+            if self.power >= self.consumption and self.temperature < 81.0:
+                if not self.functional:
+                    self.functional = True
+                self.power -= self.consumption
+            else:
+                self.reset_location()
         elif self.name == 'ATX':    #Does not consume power, it generates it
             if self.stored_power > 4500.0:
                 self.reset_location()
         elif self.name == 'CPU':
-            pass
+            if self.refined_power >= self.consumption and self.temperature <50.0:
+                if not self.functional:
+                    self.functional = True
+                self.refined_power -= self.consumption
+            else:
+                self.functional = True
         elif self.name == 'DISK':
             pass
         elif self.name == 'CLK':
@@ -540,11 +613,13 @@ class ModelLocation:
                 if self.power >= 100.0:
                     self.power -= 100; self.refined_power += 10
             elif self.name == 'RAM':
-                pass
+                ram_change = round(uniform(0.0, 0.5), 3)
+                self.ram_in_use += ram_change
+                self.available_ram -= ram_change
             elif self.name == 'ATX':
                 self.stored_power += round(uniform(10.0, 15.0), 2)
             elif self.name == 'CPU':
-                pass
+                self.processes += randrange(1, 6)
             elif self.name == 'DISK':
                 pass
             elif self.name == 'CLK':
@@ -584,11 +659,13 @@ class ModelLocation:
             elif self.name == 'VRM':
                 self.generate_resource()
             elif self.name == 'RAM':
-                pass
+                ram_change = round(uniform(0.0, 0.1), 3)
+                self.ram_in_use -= ram_change
+                self.available_ram += ram_change
             elif self.name == 'ATX':
                 self.generate_resource()
             elif self.name == 'CPU':
-                pass
+                self.processes -= randrange(1, 3)
             elif self.name == 'DISK':
                 pass
             elif self.name == 'CLK':
