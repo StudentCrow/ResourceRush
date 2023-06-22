@@ -1,12 +1,11 @@
 # TODO hay que hacer bien los vectores (lista de listas) para asociar los scores con los names
 from Imports import *
-from Viewer_Menu import *
-from Model_Leaderboards import *
+pygame.init()
 
 def Leaderboards():
     # creación ventana, título y background
     window = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Resource Rush")
+    pygame.display.set_caption("Leaderboards")
     img_background = pygame.image.load("img/Leaderboards.png")        # TODO dibujar el background del leaderboards
     # fuente texto
     font = pygame.font.SysFont("Showcard Gothic", 45)
@@ -47,7 +46,21 @@ def Leaderboards():
     window.blit(rank4_text, rank4_coord_rect)
     window.blit(rank5_text, rank5_coord_rect)
 
-# ---------------------------------------------------------------------------------- COLUMNA SCORES
+    # ---------------------------------------------------------------------------------- COLUMNA SCORES Y NAMES
+    score_and_name = [(800, "DNS"), (200, "JSG"), (900, "UQP"), (100, "APQ"), (350, "HHH")]
+    # scores
+    score1_text = font.render(f"{score_and_name[0]}", True, WHITE)
+    score2_text = font.render(f"{score_and_name[1]}", True, WHITE)
+    score3_text = font.render(f"{score_and_name[2]}", True, WHITE)
+    score4_text = font.render(f"{score_and_name[3]}", True, WHITE)
+    score5_text = font.render(f"{score_and_name[4]}", True, WHITE)
+    # names
+    name1_text = font.render(f"{score_and_name[0]}", True, WHITE)
+    name2_text = font.render(f"{score_and_name[1]}", True, WHITE)
+    name3_text = font.render(f"{score_and_name[2]}", True, WHITE)
+    name4_text = font.render(f"{score_and_name[3]}", True, WHITE)
+    name5_text = font.render(f"{score_and_name[4]}", True, WHITE)
+    # ----------------------------------------------------------------------------------- COLUMNA SCORES
     # asigno valores a top_scores TODO valores top_score tengo que asignarlos mediante Model_Leaderboards
     top_scores = (200, 400, 100, 600, 550)
     # valores top
@@ -121,6 +134,6 @@ def Leaderboards():
 
 
 if __name__ == "__main__":
-    leaderboards()
+    Leaderboards()
 
 pygame.quit()
