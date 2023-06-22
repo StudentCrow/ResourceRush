@@ -4,7 +4,7 @@ pygame.init()
 window = pygame.display.set_mode((200, 200))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 100)
-counter = 30
+counter = 10
 timer = 1000
 time_warp = 0
 time_running = True

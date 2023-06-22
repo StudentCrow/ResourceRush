@@ -1,8 +1,7 @@
 # Imports
 import pygame
 import pygame_gui
-import sys
-import os
+
 
 # COLORES
 WHITE = (255, 255, 255)
