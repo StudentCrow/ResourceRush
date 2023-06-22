@@ -1,11 +1,7 @@
-import pygame, sys
+import pygame, sys, os
 from Imports import *
 pygame.init()
-
-WIDTH = 1000
-HEIGHT = 755
-
-def menu():
+def Menu():
     # creación ventana y título
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Resource Rush")
@@ -57,9 +53,5 @@ def menu():
                     print("Mejor ni lo mires, que eres el último.")  # TODO acción a cambiar
                 elif quit_game_rect_coord.collidepoint(event.pos):  # si se clica en el botón QUIT GAME
                     running = False
-
-
-if __name__ == "__main__":
-    menu()
 
 pygame.quit()

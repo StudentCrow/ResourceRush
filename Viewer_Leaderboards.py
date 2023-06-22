@@ -2,10 +2,8 @@
 from Imports import *
 from Viewer_Menu import *
 from Model_Leaderboards import *
-import pygame
-pygame.init()
 
-def leaderboards():
+def Leaderboards():
     # creación ventana, título y background
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Resource Rush")

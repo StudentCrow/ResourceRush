@@ -1,8 +1,6 @@
 # Imports
-import pygame
-import pygame_gui
-import sys
-import os
+import pygame, pygame_gui, sys, os
+pygame.init()
 
 # COLORES
 WHITE = (255, 255, 255)
@@ -19,4 +17,5 @@ WIDTH = 1000
 HEIGHT = 755
 WINDOW_DIM = (WIDTH, HEIGHT)
 
-#
+#LETTERS ALLOWED
+abc = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]

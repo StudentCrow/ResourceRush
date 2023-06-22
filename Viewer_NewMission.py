@@ -1,37 +1,39 @@
-# modelo para insertar el nombre una vez se clique en new mission TODO falta acabar
-import pygame
-import pygame_gui
-from Viewer_Menu import *
-
-pygame.init()
-
-# ventana
-screen = pygame.display.set_mode(WIDTH, HEIGHT)
-pygame.display.set_caption("RESOURCE RUSH")
-# administrador de interfaz
-manager = pygame_gui.UIManager(WIDTH, HEIGHT)
-# cuadro de texto
-text_entry = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((50, 100), (300, 50)), manager=manager)
-text_entry.set_allowed_characters("abcdefghijklmnopqrstuvwxyz")
-text_entry.set_text_length_limit(3)
-
-# bucle prueba
-running = True
-clock = pygame.time.Clock()
-
-while running:
-    time_delta = clock.tick(60) / 1000
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        manager.process_events(event)
-    manager.update(time_delta)
-
-    screen.fill(BLACK)
-
-    manager.draw_ui(screen)
-
-    pygame.display.update()
+# TODO añadir bucle al bucle principal
+from Imports import *
+def NewMission():
+    # Ventana
+    window = pygame.display.set_mode(WINDOW_DIM)
+    pygame.display.set_caption("New Mission")
+    # Administrador de interfaz
+    manager = pygame_gui.UIManager(WINDOW_DIM)
+    # Fuente y título de texto
+    font = pygame.font.SysFont("Showcard Gothic", 45)
+    title_text = font.render("Introduzca su nombre", True, RED)
+    title_rect_coord = title_text.get_rect(center=(WIDTH / 2, 0.3 * HEIGHT))
+    # Cuadro de texto
+    text_entry = pygame_gui.elements.UITextEntryLine(
+        relative_rect=pygame.Rect((0.35 * WIDTH, 0.4 * HEIGHT), (0.3 * WIDTH, 0.08 * HEIGHT)),
+        manager=manager,
+        visible=True)
+    text_entry.set_allowed_characters("abc")
+    text_entry.set_text_length_limit(3)
+    # Bucle principal -----------------------------------------------------------
+    running = True
+    clock = pygame.time.Clock()
+    while running:
+        time_delta = clock.tick(60) / 1000
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    print("Ir hacia interfaz de juego")
+            manager.process_events(event)
+        manager.update(time_delta)
+        window.fill(BLACK)
+        pygame.draw.rect(window, BLACK, title_rect_coord)
+        window.blit(title_text, title_rect_coord)
+        manager.draw_ui(window)
+        pygame.display.update()
 
 pygame.quit()
