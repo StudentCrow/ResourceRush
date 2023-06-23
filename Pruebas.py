@@ -16,8 +16,9 @@ def main():
     # surf[:] = (255, 255, 255)
     # surf[::4, ::4] = (0, 0, 255)
 
+    first_pos = (int, int)
     bit_prueba = ViewerBit(screen, 320, 240)
-    bit_prueba.draw_bit()
+    bit_prueba.drawBit()
 
     pygame.display.update()
 
@@ -41,16 +42,20 @@ def main():
                 if not selection_on:
                     selection_on = True
                     selection = SelectionRect(screen, event.pos)
+                    first_pos = event.pos
             elif event.type == MOUSEMOTION:
                 if selection_on:
                     selection.updateRect(event.pos)
                     selection.draw(screen)
+                    bit_prueba.checkBitSelection(first_pos, event.pos)
             elif event.type == MOUSEBUTTONUP and event.button == 1:
                 if selection_on:
                     selection_on = False
                     rect = selection.updateRect(event.pos)
                     selection.hide(screen)
                     print("Final selection rectangle:", rect)
+            bit_prueba.drawBit()
+            pygame.display.update()
     pygame.quit()
 
 if __name__ == '__main__': main()
