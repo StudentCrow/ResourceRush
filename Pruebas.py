@@ -55,8 +55,12 @@ def main():
                     rect = selection.updateRect(event.pos)
                     selection.hide(screen)
                     print("Final selection rectangle:", rect)
-            bit_prueba.drawBit()
-            pygame.display.update()
+            elif event.type == MOUSEWHEEL:
+                if not selection_on:
+                    bit_prueba.zoomBit(event.y)
+        screen.fill((255, 255, 255))
+        bit_prueba.drawBit()
+        pygame.display.update()
     pygame.quit()
 
 if __name__ == '__main__': main()
