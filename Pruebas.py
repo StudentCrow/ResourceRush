@@ -1,6 +1,7 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit
+from SelectionRectangle import SelectionRect
 
 
 
@@ -26,6 +27,7 @@ def main():
     pygame.time.set_timer(timer_event, timer)
 
     run = True
+    selection_on = False
     while run:
         clock.tick(60)
         for event in pygame.event.get():
@@ -35,6 +37,20 @@ def main():
                 counter -= 1
                 if counter == 0:
                     run = False
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                if not selection_on:
+                    selection_on = True
+                    selection = SelectionRect(screen, event.pos)
+            elif event.type == MOUSEMOTION:
+                if selection_on:
+                    selection.updateRect(event.pos)
+                    selection.draw(screen)
+            elif event.type == MOUSEBUTTONUP and event.button == 1:
+                if selection_on:
+                    selection_on = False
+                    rect = selection.updateRect(event.pos)
+                    selection.hide(screen)
+                    print("Final selection rectangle:", rect)
     pygame.quit()
 
 if __name__ == '__main__': main()
