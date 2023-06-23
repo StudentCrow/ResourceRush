@@ -8,7 +8,8 @@ from SelectionRectangle import SelectionRect
 def main():
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((640, 480), 0, 24)
+    screen_res = pygame.display.Info()
+    screen = pygame.display.set_mode((screen_res.current_w, screen_res.current_h), pygame.FULLSCREEN)
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
@@ -17,7 +18,7 @@ def main():
     # surf[::4, ::4] = (0, 0, 255)
 
     first_pos = (int, int)
-    bit_prueba = ViewerBit(screen, 320, 240)
+    bit_prueba = ViewerBit(screen, screen_res.current_w/2 - 50/2, screen_res.current_h/2 - 50/2)
     bit_prueba.drawBit()
 
     pygame.display.update()
@@ -32,7 +33,7 @@ def main():
     while run:
         clock.tick(60)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 run = False
             elif event.type == timer_event:
                 counter -= 1
