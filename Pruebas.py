@@ -58,7 +58,8 @@ def main():
             elif event.type == MOUSEWHEEL:
                 if not selection_on:
                     bit_prueba.zoomBit(event.y)
-        screen.fill((255, 255, 255))
+        if not selection_on:
+            screen.fill((255, 255, 255))
         bit_prueba.drawBit()
         pygame.display.update()
     pygame.quit()
