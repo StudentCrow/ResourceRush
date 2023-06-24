@@ -1,83 +1,25 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
-import pynumeric, copy
 
+class SelectionRectangle:
+    def __init__(self, first_pos):
+        self.first_pos = first_pos
+        self.mouse_pos = first_pos
+        # self.left = int
+        # self.top = int
+        # self.width = int
+        # self.height = int
+        self.color = (0, 0, 0)
 
-class SelectionRect:
-    """ class SelectionRect utility class for using selection rectangles"""
+    #Function to update the new selection area
+    def updateSelection(self, mouse_pos):
+        self.mouse_pos = mouse_pos
 
-    def __init__(self, screen, start, col=(0, 0, 0)):
-        """ __init__(self,screen,start,col=(0,0,0))
-        Constructor. Pass starting point of selection rectangle in 'start'
-        and color value in which the selection rectangle shall be drawn
-        in 'col'
-        """
-        self.start = start
-        self.col = col
-        self.oldrect = start[0], start[1], 1, 1
-        tmp = screen.get_at((start[0], start[1]))[:3]
-        self.screen_backup = [[tmp], [tmp], [tmp], [tmp]]
-
-    def updateRect(self, now):
-        """ updateRect(self,now) -> rect tuple
-        This returns a rectstyle tuple describing the selection rectangle
-        between the starting point (passed to __init__) and the 'now' edge and
-        updates the internal rectangle information for correct drawing.
-        """
-        x, y = self.start
-        mx, my = now
-        if mx < x:
-            if my < y:
-                self.rect = mx, my, x - mx, y - my
-            else:
-                self.rect = mx, y, x - mx, my - y
-        elif my < y:
-            self.rect = x, my, mx - x, y - my
-        else:
-            self.rect = x, y, mx - x, my - y
-        return self.rect
-
-    def draw(self, screen):
-        """ draw(self,screen)
-        This hides the old selection rectangle and draws the current one
-        """
-        # just some shortcuts :P
-        surf = pygame.surfarray.pixels3d(screen)
-        r = self.rect
-        # hide selection rectangle
-        self.hide(screen)
-
-        # update background information
-        self.screen_backup[0] = copy.copy(surf[r[0]:r[0] + r[2], r[1]])
-        self.screen_backup[1] = copy.copy(surf[r[0]:r[0] + r[2], r[1] + r[3] - 1])
-        self.screen_backup[2] = copy.copy(surf[r[0], r[1]:r[1] + r[3]])
-        self.screen_backup[3] = copy.copy(surf[r[0] + r[2] - 1, r[1]:r[1] + r[3]])
-
-        # draw selection rectangle:
-        surf[r[0]:r[0] + r[2], r[1]] = self.col
-        surf[r[0]:r[0] + r[2], r[1] + r[3] - 1] = self.col
-        surf[r[0], r[1]:r[1] + r[3]] = self.col
-        surf[r[0] + r[2] - 1, r[1]:r[1] + r[3]] = self.col
-
-        self.oldrect = r
-
-        pygame.display.update(r)
-
-    def hide(self, screen):
-        """ hide(self,screen)
-        This hides the selection rectangle using the stored background
-        information. You usually call this after you're finished with the
-        selection to hide the last rectangle.
-        """
-        surf = pygame.surfarray.pixels3d(screen)
-        x, y, x2, y2 = self.oldrect[0], self.oldrect[1], \
-            self.oldrect[0] + self.oldrect[2], \
-            self.oldrect[1] + self.oldrect[3]
-        surf[x:x2, y] = self.screen_backup[0]
-        surf[x:x2, y2 - 1] = self.screen_backup[1]
-        surf[x, y:y2] = self.screen_backup[2]
-        surf[x2 - 1, y:y2] = self.screen_backup[3]
-        pygame.display.update(self.oldrect)
+    #Function to draw the selection rectangle
+    def drawSelection(self, screen):
+        rect = Rect(min(self.first_pos[0], self.mouse_pos[0]), min(self.first_pos[1], self.mouse_pos[1]),
+                    abs(self.first_pos[0]-self.mouse_pos[0]), abs(self.first_pos[1]-self.mouse_pos[1]))
+        pygame.draw.rect(screen, self.color, rect, 1)
 
 
 # def main():
@@ -126,4 +68,4 @@ class SelectionRect:
 #     pygame.quit()
 #
 #
-# if __name__ == '__main__': main()
+#if __name__ == '__main__': main()

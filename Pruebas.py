@@ -2,7 +2,7 @@ import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ModelLocation import ModelLocation
-from SelectionRectangle import SelectionRect
+from SelectionRectangle import SelectionRectangle
 
 
 
@@ -60,20 +60,15 @@ def main():
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 if not selection_on:
                     selection_on = True
-                    selection = SelectionRect(screen, event.pos)
                     first_pos = event.pos
+                    selection = SelectionRectangle(event.pos)
             elif event.type == MOUSEMOTION:
                 if selection_on:
-                    mouse_pos = event.pos
-                    selection.updateRect(mouse_pos)
-                    selection.draw(screen)
-                    bit_prueba.checkBitSelection(first_pos, mouse_pos)
+                    selection.updateSelection(event.pos)
+                    bit_prueba.checkBitSelection(first_pos, event.pos)
             elif event.type == MOUSEBUTTONUP and event.button == 1:
                 if selection_on:
                     selection_on = False
-                    rect = selection.updateRect(event.pos)
-                    selection.hide(screen)
-                    print("Final selection rectangle:", rect)
             elif event.type == MOUSEWHEEL:
                 if not selection_on:
                     bit_prueba.zoomBit(event.y)
@@ -94,7 +89,8 @@ def main():
                 if not model_bit_prueba.GoToCheck:
                     right = False
         bit_prueba.drawBit()
-
+        if selection_on:
+            selection.drawSelection(screen)
         pygame.display.update()
     pygame.quit()
 
