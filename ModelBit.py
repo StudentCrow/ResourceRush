@@ -1,6 +1,5 @@
 import pygame
 from ModelOrder import ModelOrder
-from ModelLocation import ModelLocation
 class InvalidOrderError(Exception):
     """
     Custom error that gets executed when the given order to the bit is not valid
@@ -31,7 +30,7 @@ class ModelBit:
     kill_counter = 0 #Counts which was the last bit to die
     instances = [] #Saves the instances of ModelBit
 
-    def __init__(self, name, locations, time=0.0, x=0, y=0, limit=100.0,
+    def __init__(self, name, locations, x=0, y=0, time=0.0, limit=100.0,
                  subsystem=False, critic=False, load=0.0, goto=False, fix=False,
                  mine=False, move=False):
         ModelBit.counter += 1
@@ -183,16 +182,17 @@ class ModelBit:
                     new_y = location.y
             if self.x != new_x:
                 if new_x < self.x:
-                    self.x -= 10
+                    self.x -= 5
                 elif new_x > self.x:
-                    self.x += 10
+                    self.x += 5
             if self.y != new_y:
                 if new_y < self.y:
-                    self.y -= 10
+                    self.y -= 5
                 elif new_y > self.y:
-                    self.y += 10
+                    self.y += 5
             if self.x == new_x and self.y == new_y:
                 self.GoToCheck = False
+        #Must be tweaked in order to adpat to any possible always going over the desired position situation
         elif not self.GoToCheck:
             print('Go to order has not been given yet')
 
