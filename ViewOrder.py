@@ -1,5 +1,5 @@
 import pygame
-import  sys
+import time
 from pygame.locals import *
 
 class ViewOrder:
@@ -27,4 +27,7 @@ class ViewOrder:
     def drawOrderText(self, text, screen):
         text_image = self.font.render(text, True, (255, 255, 255))
         text_rect = text_image.get_rect(center=self.fill_rect.center)
+        cursor = Rect(text_rect.topright, (3, text_rect.height))
+        if time.time() % 1 > 0.5:
+            pygame.draw.rect(screen, (255, 255, 255), cursor)
         screen.blit(text_image, text_rect)
