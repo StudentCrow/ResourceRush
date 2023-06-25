@@ -77,7 +77,7 @@ def main():
                         ModelOrder.exists = True
                 elif not selection_on and not order_on and send_order:
                     send_order = False
-                    #ModelOrderBox.checkOrder()
+                    ModelOrder.exists = False
             elif event.type == MOUSEMOTION:
                 if selection_on:
                     selection.updateSelection(event.pos)
@@ -90,14 +90,15 @@ def main():
                     bit_prueba.zoomBit(event.y)
         if ModelOrder.exists:
             if ModelOrderBox.send:
-                if ModelOrderBox.text == 'LEFT':
+                if ModelOrderBox.text == 'LEFT' and bit_prueba.bit_selected:
                     if right: right = False
                     left = True
                     model_bit_prueba.GoToCheck = True
-                elif ModelOrderBox.text == 'RIGHT':
+                elif ModelOrderBox.text == 'RIGHT' and bit_prueba.bit_selected:
                     if left: left = False
                     right = True
                     model_bit_prueba.GoToCheck = True
+                ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
         if model_bit_prueba.GoToCheck:
