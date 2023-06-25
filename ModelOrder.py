@@ -5,6 +5,7 @@ class ModelOrder:
     Model part class that gets the text orders
     to control the bits in the game
     """
+    exists = False
     def __init__(self, text=''):
         self.text = text
         self.send = False

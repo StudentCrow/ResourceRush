@@ -51,14 +51,14 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
-                elif event.key == pygame.K_LEFT:
-                    if not left and not model_bit_prueba.GoToCheck:
-                        left = True
-                        model_bit_prueba.GoToCheck = True
-                elif event.key == pygame.K_RIGHT:
-                    if not right and not model_bit_prueba.GoToCheck:
-                        right = True
-                        model_bit_prueba.GoToCheck = True
+                # elif event.key == pygame.K_LEFT:
+                #     if not left and not model_bit_prueba.GoToCheck:
+                #         left = True
+                #         model_bit_prueba.GoToCheck = True
+                # elif event.key == pygame.K_RIGHT:
+                #     if not right and not model_bit_prueba.GoToCheck:
+                #         right = True
+                #         model_bit_prueba.GoToCheck = True
                 else:
                     if send_order:
                         ModelOrderBox.getOrder(event)
@@ -74,6 +74,7 @@ def main():
                     if not send_order:
                         send_order = True
                         ModelOrderBox = ModelOrder()
+                        ModelOrder.exists = True
                 elif not selection_on and not order_on and send_order:
                     send_order = False
                     #ModelOrderBox.checkOrder()
@@ -87,6 +88,16 @@ def main():
             elif event.type == MOUSEWHEEL:
                 if not selection_on:
                     bit_prueba.zoomBit(event.y)
+        if ModelOrder.exists:
+            if ModelOrderBox.send:
+                if ModelOrderBox.text == 'LEFT':
+                    if right: right = False
+                    left = True
+                    model_bit_prueba.GoToCheck = True
+                elif ModelOrderBox.text == 'RIGHT':
+                    if left: left = False
+                    right = True
+                    model_bit_prueba.GoToCheck = True
 
         screen.fill((255, 255, 255))
         if model_bit_prueba.GoToCheck:
