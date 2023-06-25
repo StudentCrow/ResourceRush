@@ -17,7 +17,7 @@ def main():
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
-    Location1 = ModelLocation("One", 50, 540); Location2 = ModelLocation("Two", 1870, 540)
+    Location1 = ModelLocation("ONE", 50, 540); Location2 = ModelLocation("TWO", 1870, 540)
     model_bit_prueba = ModelBit("1", [Location1, Location2], posx, posy)
 
     first_pos = (int, int)
@@ -38,7 +38,6 @@ def main():
     selection_on = False
     order_on = False
     send_order = False
-    left = False; right = False
     while run:
         clock.tick(60)
         for event in pygame.event.get():
@@ -90,30 +89,14 @@ def main():
                     bit_prueba.zoomBit(event.y)
         if ModelOrder.exists:
             if ModelOrderBox.send:
-                if ModelOrderBox.text == 'LEFT' and bit_prueba.bit_selected:
-                    if right: right = False
-                    left = True
-                    model_bit_prueba.GoToCheck = True
-                elif ModelOrderBox.text == 'RIGHT' and bit_prueba.bit_selected:
-                    if left: left = False
-                    right = True
-                    model_bit_prueba.GoToCheck = True
+                model_bit_prueba.receive_order(ModelOrderBox.text)
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
         if model_bit_prueba.GoToCheck:
-            if left:
-                model_bit_prueba.go_to("One")
-                bit_prueba.x = model_bit_prueba.x
-                bit_prueba.y = model_bit_prueba.y
-                if not model_bit_prueba.GoToCheck:
-                    left = False
-            elif right:
-                model_bit_prueba.go_to("Two")
-                bit_prueba.x = model_bit_prueba.x
-                bit_prueba.y = model_bit_prueba.y
-                if not model_bit_prueba.GoToCheck:
-                    right = False
+            model_bit_prueba.go_to(model_bit_prueba.loc)
+            bit_prueba.x = model_bit_prueba.x
+            bit_prueba.y = model_bit_prueba.y
         bit_prueba.drawBit()
         if selection_on:
             selection.drawSelection(screen)

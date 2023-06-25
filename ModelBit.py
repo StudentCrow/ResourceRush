@@ -93,7 +93,8 @@ class ModelBit:
                         if reference == DecomposedOrd:
                             self.MineCheck = True
                         else:
-                            raise InvalidOrderError('INVALID ORDER')
+                            #raise InvalidOrderError('INVALID ORDER')
+                            return ''
                     elif self.MineCheck:
                         return ''
                 case 2: #Case when the order is fix
@@ -102,22 +103,26 @@ class ModelBit:
                         if reference == DecomposedOrd[0]:
                             destination = DecomposedOrd[1]
                             if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                return ''
                             else:
                                 if self.loc != destination:
-                                    raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
+                                    #raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
+                                    return ''
                                 elif self.loc == destination:
                                     self.MineCheck = False
                                     self.FixCheck = True
                                     self.subsystem = True
                         else:
-                            raise InvalidOrderError('INVALID ORDER')
+                            #raise InvalidOrderError('INVALID ORDER')
+                            return ''
                 case 3: #Case when the order is go to
                     reference = self.OrdList[2].split()
                     if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1]:
                         destination = DecomposedOrd[2]
                         if destination not in self.LocationListNames:  # In case the given location is not found in the available list, raise the custom error
-                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                            #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                            return ''
                         else:
                             if self.loc == destination:  # If the bit is already at the given location, do nothing
                                 return ''
@@ -127,7 +132,8 @@ class ModelBit:
                                 self.MoveCheck = False
                                 self.GoToCheck = True
                     else:
-                        raise InvalidOrderError('INVALID ORDER')
+                        #raise InvalidOrderError('INVALID ORDER')
+                        return ''
                 case 4: #Case when the order is get or store
                     if not self.GoToCheck and not self.MoveCheck:
                         GetReference = self.OrdList[3].split()
@@ -135,7 +141,8 @@ class ModelBit:
                         if GetReference[0] == DecomposedOrd[0] and GetReference[2] == DecomposedOrd[2]: #The order is a get
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
-                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                return ''
                             else:
                                 if destination != self.loc:
                                     return ''
@@ -146,7 +153,8 @@ class ModelBit:
                         elif StoreReference[0] == DecomposedOrd[0] and StoreReference[2] == DecomposedOrd[2]: #The order is a store
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
-                                raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
+                                return ''
                             else:
                                 if destination != self.loc:
                                     return ''
@@ -154,25 +162,28 @@ class ModelBit:
                                     self.MineCheck = False
                                     destination.get_power(self.name)    #Method from ModelLocation that gets power from a bit
                         else:
-                            raise InvalidOrderError('INVALID ORDER')
+                            #raise InvalidOrderError('INVALID ORDER')
+                            return ''
                 case 5: #Case when the order is move
                     reference = self.OrdList[5].split()
                     if reference[0] == DecomposedOrd[0] and reference[2] == DecomposedOrd[2] and  reference[4] == DecomposedOrd[4]:
                         get_destination = DecomposedOrd[3]
                         store_destination = DecomposedOrd[5]
                         if get_destination not in self.LocationListNames or store_destination not in self.LocationListNames:
-                            raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                            #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
+                            return ''
                         else:
                             self.GetDestination = get_destination
                             self.loc = get_destination
                             self.StoreDestination = store_destination
                             self.MoveCheck = True
                     else:
-                        raise InvalidOrderError('INVALID ORDER')
+                        #raise InvalidOrderError('INVALID ORDER')
+                        return ''
                 case _: #Raises custom error
-                    raise InvalidOrderError('INVALID ORDER')
-        else:
-            raise InvalidOrderError('CANT RECEIVE AN ORDER WHILE IN A SUBSYSTEM')
+                    return ''
+        # else:
+        #     raise InvalidOrderError('CANT RECEIVE AN ORDER WHILE IN A SUBSYSTEM')
 
     def go_to(self, destination): #Method that moves a bit to a designated location
         if self.GoToCheck:
@@ -193,8 +204,8 @@ class ModelBit:
             if self.x == new_x and self.y == new_y:
                 self.GoToCheck = False
         #Must be tweaked in order to adpat to any possible always going over the desired position situation
-        elif not self.GoToCheck:
-            print('Go to order has not been given yet')
+        # elif not self.GoToCheck:
+        #     print('Go to order has not been given yet')
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:
@@ -221,8 +232,8 @@ class ModelBit:
                 if not self.GoToCheck:
                     StoreDestination.get_power(self.name)
                     self.loc = GetDestination
-        elif not self.MoveCheck:
-            print('Move order has not been given yet')
+        # elif not self.MoveCheck:
+        #     print('Move order has not been given yet')
 
 def main():
     """Pruebas funcionamiento de órden go to"""
@@ -286,5 +297,5 @@ def main():
 
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
