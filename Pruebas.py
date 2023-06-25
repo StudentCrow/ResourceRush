@@ -2,6 +2,7 @@ import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ModelLocation import ModelLocation
+from ViewOrder import ViewOrder
 from SelectionRectangle import SelectionRectangle
 
 
@@ -27,8 +28,8 @@ def main():
     bit_prueba = ViewerBit(screen, posx, posy)
     bit_prueba.drawBit()
 
-    OrderBox = Rect(screen_res.current_w-450, screen_res.current_h-100, 450, 100)
-    pygame.draw.rect(screen, (0, 0, 0), OrderBox)
+    OrderBox = ViewOrder(screen_res)
+    OrderBox.drawOrder(screen)
 
     pygame.display.update()
 
@@ -93,7 +94,8 @@ def main():
         bit_prueba.drawBit()
         if selection_on:
             selection.drawSelection(screen)
-        pygame.draw.rect(screen, (0, 0, 0), OrderBox)
+        OrderBox.checkOrderCollision(pygame.mouse.get_pos())
+        OrderBox.drawOrder(screen)
         pygame.display.update()
     pygame.quit()
 
