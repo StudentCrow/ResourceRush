@@ -20,10 +20,6 @@ def main():
     Location1 = ModelLocation("One", 50, 540); Location2 = ModelLocation("Two", 1870, 540)
     model_bit_prueba = ModelBit("1", [Location1, Location2], posx, posy)
 
-    # surf = pygame.surfarray.pixels3d(screen)
-    # surf[:] = (255, 255, 255)
-    # surf[::4, ::4] = (0, 0, 255)
-
     first_pos = (int, int)
     bit_prueba = ViewerBit(screen, posx, posy)
     bit_prueba.drawBit()
@@ -40,6 +36,7 @@ def main():
 
     run = True
     selection_on = False
+    order_on = False
     left = False; right = False
     while run:
         clock.tick(60)
@@ -62,7 +59,7 @@ def main():
                         right = True
                         model_bit_prueba.GoToCheck = True
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                if not selection_on:
+                if not selection_on and not order_on:
                     selection_on = True
                     first_pos = event.pos
                     selection = SelectionRectangle(event.pos)
@@ -94,7 +91,8 @@ def main():
         bit_prueba.drawBit()
         if selection_on:
             selection.drawSelection(screen)
-        OrderBox.checkOrderCollision(pygame.mouse.get_pos())
+        if not selection_on:
+            order_on = OrderBox.checkOrderCollision(pygame.mouse.get_pos())
         OrderBox.drawOrder(screen)
         pygame.display.update()
     pygame.quit()
