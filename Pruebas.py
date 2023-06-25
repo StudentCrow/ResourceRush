@@ -2,7 +2,7 @@ import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ModelLocation import ModelLocation
-from ViewOrder import ViewOrder
+from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
 from SelectionRectangle import SelectionRectangle
 
 
@@ -37,6 +37,7 @@ def main():
     run = True
     selection_on = False
     order_on = False
+    send_order = False
     left = False; right = False
     while run:
         clock.tick(60)
@@ -58,11 +59,23 @@ def main():
                     if not right and not model_bit_prueba.GoToCheck:
                         right = True
                         model_bit_prueba.GoToCheck = True
+                else:
+                    if send_order:
+                        ModelOrderBox.getOrder(event)
+                        if ModelOrderBox.send:
+                            send_order = False
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                if not selection_on and not order_on:
+                if not selection_on and not order_on and not send_order:
                     selection_on = True
                     first_pos = event.pos
                     selection = SelectionRectangle(event.pos)
+                elif order_on and not selection_on and not send_order:
+                    if not send_order:
+                        send_order = True
+                        ModelOrderBox = ModelOrder()
+                elif not selection_on and not order_on and send_order:
+                    send_order = False
+                    #ModelOrderBox.checkOrder()
             elif event.type == MOUSEMOTION:
                 if selection_on:
                     selection.updateSelection(event.pos)
@@ -94,6 +107,8 @@ def main():
         if not selection_on:
             order_on = OrderBox.checkOrderCollision(pygame.mouse.get_pos())
         OrderBox.drawOrder(screen)
+        if send_order:
+            OrderBox.drawOrderText(ModelOrderBox.text, screen)
         pygame.display.update()
     pygame.quit()
 

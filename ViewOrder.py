@@ -1,8 +1,10 @@
-import pygame.draw
+import pygame
+import  sys
 from pygame.locals import *
 
 class ViewOrder:
     def __init__(self, screen_res):
+        self.font = pygame.font.SysFont('arial.ttf', 35)
         self.fill_color = (0, 0, 0)
         self.border_color = (255, 0, 0)
         self.collided_color = (0, 255, 0)
@@ -21,3 +23,8 @@ class ViewOrder:
     def checkOrderCollision(self, mouse_pos):
         self.collided_check = pygame.Rect.collidepoint(self.fill_rect, mouse_pos)
         return self.collided_check
+
+    def drawOrderText(self, text, screen):
+        text_image = self.font.render(text, True, (255, 255, 255))
+        text_rect = text_image.get_rect(center=self.fill_rect.center)
+        screen.blit(text_image, text_rect)
