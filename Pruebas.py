@@ -66,6 +66,7 @@ def main():
                             send_order = False
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 if not selection_on and not order_on and not send_order:
+                    if bit_prueba.bit_selected: bit_prueba.bit_selected = False
                     selection_on = True
                     first_pos = event.pos
                     selection = SelectionRectangle(event.pos)
