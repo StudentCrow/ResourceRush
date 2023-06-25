@@ -1,7 +1,5 @@
 import pygame.draw
 
-from Imports import *
-
 class ViewerBit:
     def __init__(self, display, x = 0, y = 0, size = 50, fill_color = (255, 255, 255)):
         self.display = display

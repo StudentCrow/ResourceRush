@@ -27,6 +27,9 @@ def main():
     bit_prueba = ViewerBit(screen, posx, posy)
     bit_prueba.drawBit()
 
+    OrderBox = Rect(screen_res.current_w-450, screen_res.current_h-100, 450, 100)
+    pygame.draw.rect(screen, (0, 0, 0), OrderBox)
+
     pygame.display.update()
 
     # counter = 30
@@ -74,7 +77,6 @@ def main():
                     bit_prueba.zoomBit(event.y)
 
         screen.fill((255, 255, 255))
-
         if model_bit_prueba.GoToCheck:
             if left:
                 model_bit_prueba.go_to("One")
@@ -91,6 +93,7 @@ def main():
         bit_prueba.drawBit()
         if selection_on:
             selection.drawSelection(screen)
+        pygame.draw.rect(screen, (0, 0, 0), OrderBox)
         pygame.display.update()
     pygame.quit()
 
