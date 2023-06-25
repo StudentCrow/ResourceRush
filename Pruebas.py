@@ -108,7 +108,7 @@ def main():
             order_on = OrderBox.checkOrderCollision(pygame.mouse.get_pos())
         OrderBox.drawOrder(screen)
         if send_order:
-            OrderBox.drawOrderText(ModelOrderBox.text, screen)
+            OrderBox.drawOrderText(ModelOrderBox.text, screen, ModelOrderBox)
         pygame.display.update()
     pygame.quit()
 
