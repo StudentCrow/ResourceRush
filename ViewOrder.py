@@ -8,6 +8,7 @@ class ViewOrder:
         self.fill_color = (0, 0, 0)
         self.border_color = (255, 0, 0)
         self.collided_color = (0, 255, 0)
+        self.text_color = (255, 255, 255)
         self.fill_rect = Rect(screen_res.current_w-450, screen_res.current_h-100, 450, 100)
         self.border_rect = Rect(screen_res.current_w-450, screen_res.current_h-100, 450, 100)
         self.collided_rect = Rect(screen_res.current_w-450, screen_res.current_h-100, 450, 100)
@@ -32,10 +33,10 @@ class ViewOrder:
             if model.limit: model.limit = False
         cursor = Rect(text_rect.topright, (3, text_rect.height))
         if time.time() % 1 > 0.5:
-            pygame.draw.rect(screen, (255, 255, 255), cursor)
+            pygame.draw.rect(screen, self.text_color, cursor)
         screen.blit(text_image, text_rect)
 
     def getOrderText(self, text):
-        text_image = self.font.render(text, True, (255, 255, 255))
+        text_image = self.font.render(text, True, self.text_color)
         text_rect = text_image.get_rect(center=self.fill_rect.center)
         return text_image, text_rect

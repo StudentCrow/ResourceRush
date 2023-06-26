@@ -2,6 +2,7 @@ import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
+from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
 from SelectionRectangle import SelectionRectangle
 
@@ -17,8 +18,10 @@ def main():
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
-    Chipset = ViewLocation("CHIPSET", 200, 540); GPU = ViewLocation("GPU", 1720, 540)
-    view_locations = [Chipset, GPU]
+    ATX = ViewLocation("ATX", 200, 540); GPU = ViewLocation("GPU", 1720, 540)
+    view_locations = [ATX, GPU]
+    model_ATX = ModelATX(ATX.name, ATX.x, ATX.y); model_GPU = ModelGPU(GPU.name, GPU.x, GPU.y)
+    model_locations = [model_ATX, model_GPU]
     model_bit_prueba = ModelBit("1", view_locations, posx, posy)
 
     first_pos = (int, int)
@@ -98,7 +101,13 @@ def main():
 
         screen.fill((255, 255, 255))
         for location in view_locations:
-            location.drawLocation(screen)
+            for model_location in model_locations:
+                model_location.work()
+                location.checkLocationCollision(pygame.mouse.get_pos())
+                if location.name == model_location.name:
+                    location.drawLocation(screen, model_location.functional)
+                    if location.collided_check:
+                        location.showFont(screen, model_location.power)
         if model_bit_prueba.GoToCheck:
             model_bit_prueba.go_to(model_bit_prueba.loc)
             bit_prueba.x = model_bit_prueba.x

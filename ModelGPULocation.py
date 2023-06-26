@@ -99,3 +99,6 @@ class ModelGPU:
         charge = bit.limit - bit.load
         self.power -= charge
         bit.load += charge
+
+    def work(self):
+        return ''
