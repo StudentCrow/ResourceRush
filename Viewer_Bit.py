@@ -12,10 +12,10 @@ class ViewerBit:
 
     #Function to draw the full bit
     def drawBit(self):
-        self.bit_fill = pygame.draw.rect(self.display, self.fill_color, (self.x, self.y, self.size, self.size), 0)
-        self.bit_border = pygame.draw.rect(self.display, self.border_color, (self.x, self.y, self.size, self.size), 5)
+        self.bit_fill = pygame.draw.rect(self.display, self.fill_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 0)
+        self.bit_border = pygame.draw.rect(self.display, self.border_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 5)
         if self.bit_selected:
-            self.bit_selection = pygame.draw.rect(self.display, (255, 255, 0), (self.x, self.y, self.size, self.size), 2)
+            self.bit_selection = pygame.draw.rect(self.display, (255, 255, 0), (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 2)
 
     #Function to check if a bit is being selected
     def checkBitSelection(self, first_pos, last_pos):

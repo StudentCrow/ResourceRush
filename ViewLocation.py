@@ -6,7 +6,7 @@ class ViewLocation:
         self.name = name
         self.x = x
         self.y = y
-        self.loc_rect = Rect(x-50, y-50, 100, 100)
+        self.loc_rect = Rect(x-100, y-100, 200, 200)
 
     def drawLocation(self, screen):
         pygame.draw.rect(screen, (0, 0, 0), self.loc_rect)

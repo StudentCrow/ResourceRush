@@ -17,7 +17,7 @@ def main():
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
-    Chipset = ViewLocation("CHIPSET", 50, 540); GPU = ViewLocation("GPU", 1870, 540)
+    Chipset = ViewLocation("CHIPSET", 200, 540); GPU = ViewLocation("GPU", 1720, 540)
     view_locations = [Chipset, GPU]
     model_bit_prueba = ModelBit("1", view_locations, posx, posy)
 
