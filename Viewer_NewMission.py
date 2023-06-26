@@ -24,6 +24,7 @@ def NewMission():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     print("Ir hacia interfaz de juego")

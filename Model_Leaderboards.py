@@ -6,7 +6,7 @@ from Viewer_Leaderboards import *
 
 pygame.init()
 
-class Leaderboards: # TODO singular
+class Leaderboard: # TODO singular
     def __init__(self):
         self.scores = []        # creo vector scores vacío
         self.names = []

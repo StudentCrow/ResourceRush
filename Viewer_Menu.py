@@ -1,4 +1,3 @@
-import pygame, sys, os
 from Imports import *
 from Viewer_NewMission import *
 from Viewer_Settings import *
@@ -56,7 +55,7 @@ def Menu():
                 elif leaderboards_rect_coord.collidepoint(event.pos):
                     print("Mejor ni lo mires, que eres el último.")
                     Leaderboards()
-                elif quit_game_rect_coord.collidepoint(event.pos):  # si se clica en el botón QUIT GAME
+                elif quit_game_rect_coord.collidepoint(event.pos):
                     running = False
 
 Menu()

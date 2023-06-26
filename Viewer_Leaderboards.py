@@ -118,9 +118,9 @@ def Leaderboards():
 
 # ---------------------------------------------------------------------------------- DIBUJO BOTÓN PARA ATRÁS
     # dibujo botón para volver al menú
-    pygame.draw.polygon(window, BLACK, ([30, 60], [75, 30], [75, 90]))
-    pygame.draw.polygon(window, RED, ([30, 60], [75, 30], [75, 90]), 5)
     polygon_points = ([30, 60], [75, 30], [75, 90])
+    pygame.draw.polygon(window, BLACK, polygon_points)
+    pygame.draw.polygon(window, RED, polygon_points, 5)
 
     # actualizo ventana
     pygame.display.flip()
@@ -137,5 +137,7 @@ def Leaderboards():
                     mouse_pos = pygame.mouse.get_pos()
                     if pygame.draw.polygon(window, BLACK, polygon_points).collidepoint(mouse_pos):
                         Menu()
+                        run = False
+
 
 pygame.quit()
