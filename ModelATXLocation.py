@@ -1,5 +1,4 @@
 from random import *
-from ModelBit import ModelBit
 
 class ModelATX:
     def __init__(self, name, x, y):
@@ -34,7 +33,7 @@ class ModelATX:
 
     def generateResource(self):
         self.stored_power += round(uniform(10.0, 15.0), 2)
-        
+
     def getMined(self):
         self.generateResource()
 
