@@ -1,5 +1,6 @@
 from random import *
 from ModelBit import ModelBit
+
 class ModelVRM:
     def __init__(self, name, x, y):
         self.name = name
@@ -49,7 +50,47 @@ class ModelVRM:
 
     def customAlert(self, bit):
         if self.functional:
-            pass
+            if self.alert_counter['VRM NW'] != 0 and bit.subsystem:
+                self.alert_percentage -= randrange(0, 4)
+                if self.alert_percentage <= 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
+                    if self.alert_percentage < 0: self.alert_percentage = 0
+                    self.alert_counter['VRM NW'] -= 1
+                    bit.subsystem = False
+                    bit.FixCheck = False
+            elif self.alert_counter['VRM NW'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
+                bit.subsystem = False
+                bit.FixCheck = False
         else:
             bit.subsystem = False
             bit.FixCheck = False
+            
+    def tempIncrease(self):
+        if self.functional:
+            if self.power <= 100.0 and self.temperature < 60.0: self.temperature += 1.0
+            elif self.power > 100.0: self.temperature = 10.0 * (6.0 * (self.power / 1000.0)) + 60.0
+
+    def powerManagement(self):
+        if self.temperature < 120.0:
+            if not self.functional: self.functional = True
+        else:
+            self.resetLocation()
+
+    def generateResource(self):
+        if self.raw_power >= 100.0:
+            self.raw_power -= 100; self.power += 10
+
+    def getMined(self):
+        self.generateResource()
+
+    def get_power(self, bit):    #Method for when a bit gives power to a location
+        charge = bit.load
+        self.power += charge
+        bit.load = 0
+
+    def give_power(self, bit):  #Method for when a bit gets power from a location
+        charge = bit.limit - bit.load
+        self.power -= charge
+        bit.load += charge
+
+    def work(self):
+        return ''
