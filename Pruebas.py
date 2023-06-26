@@ -3,33 +3,47 @@ from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
 from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; from ModelCPULocation import ModelCPU
-from ModelPeriLocation import ModelPeri; from ModelRAMLocation import  ModelRAM; from ModelVentLocation import ModelVent
-from ModelVRMLocation import ModelVRM; from ModelChipsetLocation import ModelChipset
+from ModelPeriLocation import ModelPERI; from ModelRAMLocation import ModelRAM; from ModelVentLocation import ModelVENT
+from ModelVRMLocation import ModelVRM; from ModelChipsetLocation import ModelCHIPSET
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
 from SelectionRectangle import SelectionRectangle
 
 
-def loadLocations():
-    return view_locations, model_locations, model_bit
+def loadLocations(screenx, screeny):
+    loc_name = ['ATX', 'CHIPSET', 'CPU', 'GPU',
+                'PERI', 'RAM', 'VENT', 'VRM']
+    positions = ['midleft', 'bottomleft', 'midbottom',
+                 'bottomright', 'midright', 'topright'
+                 , 'midtop', 'topleft']
+    rect = Rect(200, 200, screenx-400, screeny-400)
+    view_locations = []; model_locations = []
+    for pos in positions:
+        loc_pos = eval('rect.'+pos)
+        name = loc_name[positions.index(pos)]
+        code = name + '=ViewLocation("' + name + '",' + str(loc_pos[0]) + ',' + str(loc_pos[1]) + ')'
+        exec(code)
+        code = 'view_locations.append('+name+')'
+        exec(code)
+        code = 'model_'+name+'=Model'+name+'("' + name + '",' + str(loc_pos[0]) + ',' + str(loc_pos[1]) + ')'
+        exec(code)
+        code = 'model_locations.append(model_'+name+')'
+        exec(code)
+    return view_locations, model_locations
 
 def main():
     pygame.init()
     clock = pygame.time.Clock()
     screen_res = pygame.display.Info()
-    posx = screen_res.current_w/2 - 50/2
-    posy = 540
     screen = pygame.display.set_mode((screen_res.current_w, screen_res.current_h), pygame.FULLSCREEN)
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
-    ATX = ViewLocation("ATX", 200, 540); GPU = ViewLocation("GPU", 1720, 540)
-    view_locations = [ATX, GPU]
-    model_ATX = ModelATX(ATX.name, ATX.x, ATX.y); model_GPU = ModelGPU(GPU.name, GPU.x, GPU.y)
-    model_locations = [model_ATX, model_GPU]
-    model_bit_prueba = ModelBit("1", view_locations, posx, posy)
+    view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
+    pos_bit = screen.get_rect().center
+    model_bit_prueba = ModelBit("1", view_locations, pos_bit[0], pos_bit[1])
 
     first_pos = (int, int)
-    bit_prueba = ViewerBit(screen, posx, posy)
+    bit_prueba = ViewerBit(screen, pos_bit[0], pos_bit[1])
     bit_prueba.drawBit()
 
     OrderBox = ViewOrder(screen_res)

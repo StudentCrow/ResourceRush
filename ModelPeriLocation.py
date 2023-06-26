@@ -1,6 +1,6 @@
 from random import *
 
-class ModelPeri:
+class ModelPERI:
     def __init__(self, name, x, y):
         self.name = name
         self.x = x
@@ -25,7 +25,7 @@ class ModelPeri:
             self.generateResource()
             ###
             # Random peripheral error
-            if self.peri_num > 0 and model_Chipset.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
+            if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
                 error = round(random(), 2)
                 if error > 0.95:  # There's 5% chance of it triggering
                     self.alert_counter['PERIPHERAL'] += 1
@@ -70,7 +70,7 @@ class ModelPeri:
             
     def tempIncrease(self):
         if self.functional:
-            if model_Chipset.chipset_power > 0.0:
+            if model_CHIPSET.chipset_power > 0.0:
                 if self.temperature < 5.0 * self.peri_num:
                     self.temperature += 0.2
             else: self.temperature = 10.0 * self.peri_num
@@ -78,7 +78,7 @@ class ModelPeri:
     def powerManagement(self):
         if self.power >= self.consumption * self.peri_num:
             if not self.functional: self.functional = True
-            variable_consumption = (1.0 - (model_Chipset.chipset_power / 100))
+            variable_consumption = (1.0 - (model_CHIPSET.chipset_power / 100))
             if variable_consumption < 0: variable_consumption = 0
             self.power -= (self.consumption * variable_consumption) * self.peri_num + self.consumption * self.peri_num
             if self.power < 0: self.power = 0
@@ -86,7 +86,7 @@ class ModelPeri:
             self.resetLocation()
             
     def generateResource(self):
-        if self.functional: model_Chipset.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
+        if self.functional: model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
 
     def getMined(self):
         if self.functional: return ''

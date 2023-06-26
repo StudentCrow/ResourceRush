@@ -1,6 +1,6 @@
 from random import *
 
-class ModelChipset:
+class ModelCHIPSET:
     def __init__(self, name, x, y):
         self.name = name
         self.x = x

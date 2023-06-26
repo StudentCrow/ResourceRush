@@ -1,6 +1,6 @@
 from random import *
 
-class ModelVent:
+class ModelVENT:
     def __init__(self, name, x, y):
         self.name = name
         self.x = x
