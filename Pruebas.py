@@ -2,11 +2,15 @@ import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
-from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU
+from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; from ModelCPULocation import ModelCPU
+from ModelPeriLocation import ModelPeri; from ModelRAMLocation import  ModelRAM; from ModelVentLocation import ModelVent
+from ModelVRMLocation import ModelVRM; from ModelChipsetLocation import ModelChipset
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
 from SelectionRectangle import SelectionRectangle
 
 
+def loadLocations():
+    return view_locations, model_locations, model_bit
 
 def main():
     pygame.init()
