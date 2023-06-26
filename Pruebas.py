@@ -91,6 +91,8 @@ def main():
             elif event.type == MOUSEWHEEL:
                 if not selection_on:
                     bit_prueba.zoomBit(event.y)
+                    for location in view_locations:
+                        location.zoomLocation(event.y)
         if ModelOrder.exists:
             if ModelOrderBox.send and bit_prueba.bit_selected:
                 model_bit_prueba.receive_order(ModelOrderBox.text)
