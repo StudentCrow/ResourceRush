@@ -1,7 +1,7 @@
 import pygame.draw
 
 class ViewerBit:
-    def __init__(self, display, x = 0, y = 0, size = 50, fill_color = (255, 255, 255)):
+    def __init__(self, display, x = 0, y = 0, fill_color = (255, 255, 255), size = 50):
         self.display = display
         self.x = x
         self.y = y
@@ -33,8 +33,8 @@ class ViewerBit:
 
     #Function to resize the bit
     def zoomBit(self, direction):
-        min_size = 10
-        max_size = 80
+        min_size = 50-40
+        max_size = 50+40
         if direction == 1 and self.size < max_size:
             self.size += 10
         elif direction == -1 and self.size > min_size:
