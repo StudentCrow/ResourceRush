@@ -193,15 +193,15 @@ class ModelBit:
                     new_y = location.y
             if self.x != new_x:
                 if new_x < self.x:
-                    self.x -= 5
+                    self.x -= 10
                 elif new_x > self.x:
-                    self.x += 5
+                    self.x += 10
             if self.y != new_y:
                 if new_y < self.y:
-                    self.y -= 5
+                    self.y -= 10
                 elif new_y > self.y:
-                    self.y += 5
-            if self.x == new_x and self.y == new_y:
+                    self.y += 10
+            if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
                 self.GoToCheck = False
         #Must be tweaked in order to adpat to any possible always going over the desired position situation
         # elif not self.GoToCheck:
