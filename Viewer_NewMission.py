@@ -14,7 +14,7 @@ def NewMission():
         relative_rect=pygame.Rect((0.35 * WIDTH, 0.4 * HEIGHT), (0.3 * WIDTH, 0.08 * HEIGHT)),
         manager=manager,
         visible=True)
-    text_entry.set_allowed_characters("abc")
+    text_entry.set_allowed_characters(abc)
     text_entry.set_text_length_limit(3)
     # Bucle principal -----------------------------------------------------------
     running = True
@@ -35,5 +35,6 @@ def NewMission():
         window.blit(title_text, title_rect_coord)
         manager.draw_ui(window)
         pygame.display.update()
+
 
 pygame.quit()
