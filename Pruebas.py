@@ -1,7 +1,7 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
-from ModelLocation import ModelLocation
+from ViewLocation import ViewLocation
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
 from SelectionRectangle import SelectionRectangle
 
@@ -17,8 +17,9 @@ def main():
     pygame.display.set_caption("Resource Rush")
     screen.fill((255, 255, 255))
 
-    Location1 = ModelLocation("ONE", 50, 540); Location2 = ModelLocation("TWO", 1870, 540)
-    model_bit_prueba = ModelBit("1", [Location1, Location2], posx, posy)
+    Chipset = ViewLocation("CHIPSET", 50, 540); GPU = ViewLocation("GPU", 1870, 540)
+    view_locations = [Chipset, GPU]
+    model_bit_prueba = ModelBit("1", view_locations, posx, posy)
 
     first_pos = (int, int)
     bit_prueba = ViewerBit(screen, posx, posy)
@@ -88,11 +89,16 @@ def main():
                 if not selection_on:
                     bit_prueba.zoomBit(event.y)
         if ModelOrder.exists:
-            if ModelOrderBox.send:
+            if ModelOrderBox.send and bit_prueba.bit_selected:
                 model_bit_prueba.receive_order(ModelOrderBox.text)
+                ModelOrder.exists = False
+            elif ModelOrderBox.send and not bit_prueba.bit_selected:
+                ModelOrderBox.text = ''
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
+        for location in view_locations:
+            location.drawLocation(screen)
         if model_bit_prueba.GoToCheck:
             model_bit_prueba.go_to(model_bit_prueba.loc)
             bit_prueba.x = model_bit_prueba.x

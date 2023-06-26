@@ -1,6 +1,5 @@
 import pygame
 import time
-from ModelOrder import  ModelOrder
 from pygame.locals import *
 
 class ViewOrder:
