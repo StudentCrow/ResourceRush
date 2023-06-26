@@ -15,6 +15,8 @@ class ModelGPU:
 
     def resetLocation(self):
         self.functional = False; self.temperature = 0.0; self.graphics = 0.0
+        for name in self.alert_counter:
+            if name != 'GRAPHICS NW' or 'POWER': self.alert_counter[name] = 0
 
     def manageAlerts(self):
         if self.functional:
