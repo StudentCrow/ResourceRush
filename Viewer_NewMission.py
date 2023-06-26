@@ -1,4 +1,3 @@
-# TODO añadir bucle al bucle principal
 from Imports import *
 def NewMission():
     # Ventana

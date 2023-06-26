@@ -1,5 +1,5 @@
-# TODO hay que hacer bien los vectores (lista de listas) para asociar los scores con los names
 from Imports import *
+from Viewer_Menu import *
 pygame.init()
 
 def Leaderboards():
@@ -120,6 +120,7 @@ def Leaderboards():
     # dibujo botón para volver al menú
     pygame.draw.polygon(window, BLACK, ([30, 60], [75, 30], [75, 90]))
     pygame.draw.polygon(window, RED, ([30, 60], [75, 30], [75, 90]), 5)
+    polygon_points = ([30, 60], [75, 30], [75, 90])
 
     # actualizo ventana
     pygame.display.flip()
@@ -131,9 +132,10 @@ def Leaderboards():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-
-
-if __name__ == "__main__":
-    Leaderboards()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if pygame.draw.polygon(window, BLACK, polygon_points).collidepoint(mouse_pos):
+                        Menu()
 
 pygame.quit()
