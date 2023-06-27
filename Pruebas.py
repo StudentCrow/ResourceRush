@@ -6,6 +6,7 @@ from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; fr
 from ModelPeriLocation import ModelPERI; from ModelRAMLocation import ModelRAM; from ModelVentLocation import ModelVENT
 from ModelVRMLocation import ModelVRM; from ModelChipsetLocation import ModelCHIPSET
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
+from ViewClock import  ViewClock; from ModelClock import  ModelClock
 from SelectionRectangle import SelectionRectangle
 
 
@@ -30,6 +31,7 @@ def loadLocations(screenx, screeny):
         exec(code)
     return view_locations, model_locations
 
+
 def updateLocations(view_locations, model_locations, screen):
     for location in view_locations:
         for model_location in model_locations:
@@ -40,6 +42,7 @@ def updateLocations(view_locations, model_locations, screen):
                 if collision:
                     info = model_location.updateLocInfo()
                     location.showFont(screen, info)
+
 
 def loadBits(quantity, center, screen, view_locations):
     odd = quantity%2
@@ -105,8 +108,12 @@ def loadBits(quantity, center, screen, view_locations):
                 name += 1
     return viewer_bits, model_bits
 
-def createClock():
-    pass
+
+def createClock(timer):
+    clock = ModelClock(timer)
+    timer_event, clock_timer = clock.createClock()
+    return timer_event, clock_timer
+
 
 def main():
     pygame.init()
@@ -126,10 +133,10 @@ def main():
 
     pygame.display.update()
 
-    # counter = 30
-    # timer = 1000
-    # timer_event = pygame.USEREVENT + 1
-    # pygame.time.set_timer(timer_event, timer)
+    game_clock = ViewClock()
+    game_clock_event, game_clock_timer = createClock(1000)
+
+
 
     run = True
     selection_on = False
@@ -147,14 +154,6 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
-                # elif event.key == pygame.K_LEFT:
-                #     if not left and not model_bit_prueba.GoToCheck:
-                #         left = True
-                #         model_bit_prueba.GoToCheck = True
-                # elif event.key == pygame.K_RIGHT:
-                #     if not right and not model_bit_prueba.GoToCheck:
-                #         right = True
-                #         model_bit_prueba.GoToCheck = True
                 else:
                     if send_order:
                         ModelOrderBox.getOrder(event)
@@ -189,6 +188,13 @@ def main():
                         bit.zoomBit(event.y)
                     for location in view_locations:
                         location.zoomLocation(event.y)
+            if event.type == game_clock_event:
+                game_clock.seconds += 1
+                if game_clock.seconds == 60:
+                    game_clock.seconds = 0; game_clock.minutes += 1
+                if game_clock.minutes == 60:
+                    game_clock.minutes = 0; game_clock.hours += 1
+                print(game_clock.seconds, game_clock.minutes, game_clock.hours)
         if ModelOrder.exists:
             if ModelOrderBox.send:
                 for bit in viewer_bits:
@@ -217,6 +223,7 @@ def main():
         OrderBox.drawOrder(screen)
         if send_order:
             OrderBox.drawOrderText(ModelOrderBox.text, screen, ModelOrderBox)
+        game_clock.drawClock(screen)
         pygame.display.update()
     pygame.quit()
 
