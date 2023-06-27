@@ -85,7 +85,8 @@ def NewMission():       # TODO falta boton para atrás
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    print("Ir hacia interfaz de juego")
+                    print("Ir hacia interfaz de juego") # TODO falta unión con la interfaz principal de juego
+
             manager.process_events(event)
         manager.update(time_delta)
         window.fill(BLACK)
