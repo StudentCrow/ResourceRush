@@ -12,12 +12,16 @@ class ViewLocation:
         self.info_color = (0, 0, 0)
         self.off_color = (255, 0, 0)
         self.on_color = (0, 255, 0)
+        self.alert_color = (255, 0, 255)
 
-    def drawLocation(self, screen, functional = bool):
-        if not functional:
-            pygame.draw.rect(screen, self.off_color, self.loc_rect)
+    def drawLocation(self, screen, functional, alert=False):
+        if alert:
+            pygame.draw.rect(screen, self.alert_color, self.loc_rect)
         else:
-            pygame.draw.rect(screen, self.on_color, self.loc_rect)
+            if not functional:
+                pygame.draw.rect(screen, self.off_color, self.loc_rect)
+            else:
+                pygame.draw.rect(screen, self.on_color, self.loc_rect)
         font = pygame.font.SysFont('arial', round(self.size*0.35))
         text_image = font.render(self.name, True, self.text_color)
         text_rect = text_image.get_rect(center=self.loc_rect.center)

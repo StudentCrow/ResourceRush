@@ -10,6 +10,7 @@ class ModelCPU:
         self.power = 0.0
         self.processes = 0.0
         self.consumption = 20.0
+        self.alert = False
         self.alert_counter = {'power raw_power': 0, 'TEMPERATURE': 0, 'PROCESSES': 0}
 
     def resetLocation(self):

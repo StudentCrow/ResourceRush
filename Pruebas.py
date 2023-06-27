@@ -36,7 +36,7 @@ def updateLocations(view_locations, model_locations, screen):
             model_location.work()
             collision = location.checkLocationCollision(pygame.mouse.get_pos())
             if location.name == model_location.name:
-                location.drawLocation(screen, model_location.functional)
+                location.drawLocation(screen, model_location.functional, model_location.alert)
                 if collision:
                     info = model_location.updateLocInfo()
                     location.showFont(screen, info)

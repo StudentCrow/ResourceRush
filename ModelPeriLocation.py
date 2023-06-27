@@ -11,6 +11,7 @@ class ModelPERI:
         self.peri_num = 4.0
         self.consumption = 10.0
         self.alert_percentage = 0
+        self.alert = False
         self.alert_counter = {'POWER': 0, 'TEMPERATURE': 0, 'PERIPHERAL': 0}
 
     def resetLocation(self):
@@ -27,6 +28,7 @@ class ModelPERI:
         if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
             error = round(random(), 2)
             if error > 0.95:  # There's 5% chance of it triggering
+                if not self.alert: self.alert = True
                 self.alert_counter['PERIPHERAL'] += 1
                 self.peri_num -= 1.0
                 self.alert_percentage += 100
@@ -61,6 +63,7 @@ class ModelPERI:
                     if self.alert_percentage < 0: self.alert_percentage = 0
                     self.alert_counter['PERIPHERAL'] -= 1
                     self.peri_num += 1.0
+                    self.alert = False
                     bit.subsystem = False
                     bit.FixCheck = False
         else:

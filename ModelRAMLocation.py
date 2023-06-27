@@ -11,6 +11,7 @@ class ModelRAM:
         self.available_ram = 16.0
         self.ram_in_use = 0.0
         self.consumption = 5.0
+        self.alert = False
         self.alert_counter = {'POWER': 0, 'TEMPERATURE': 0, 'RAM': 0}
         
     def resetLocation(self):

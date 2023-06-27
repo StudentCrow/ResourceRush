@@ -7,6 +7,7 @@ class ModelATX:
         self.y = y
         self.functional = True
         self.power = 0.0
+        self.alert = False
         self.alert_counter = {'STORED POWER': 0}
 
     def resetLocation(self):

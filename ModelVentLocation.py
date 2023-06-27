@@ -12,6 +12,7 @@ class ModelVENT:
         self.rpm = 0.0  # Average rpm from 800 to 1000
         self.consumption = 3.0  # Consumption per vent
         self.alert_percentage = 0
+        self.alert = False
         self.alert_counter = {'POWER': 0, 'TEMPERATURE': 0, 'VENT': 0}
         
     def resetLocation(self):
@@ -31,6 +32,7 @@ class ModelVENT:
         if self.vent_num > 0:  # A vent error can happen only if there is at least 1 vent working
             error = round(random(), 2)
             if error > 0.95:  # 5% chance for the error to trigger
+                if not self.alert: self.alert = True
                 self.alert_counter['VENT'] += 1
                 self.vent_num -= 1.0
                 self.alert_percentage += 100
@@ -62,6 +64,7 @@ class ModelVENT:
                     if self.alert_percentage < 0: self.alert_percentage = 0
                     self.alert_counter['VENT'] -= 1
                     self.vent_num += 1.0
+                    self.alert = False
                     bit.subsystem = False
                     bit.FixCheck = False
             elif self.alert_counter['VENT'] == 0 and bit.subsystem:

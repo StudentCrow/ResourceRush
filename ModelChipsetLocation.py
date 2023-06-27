@@ -10,6 +10,7 @@ class ModelCHIPSET:
         self.temperature = 0.0
         self.chipset_power = 0.0
         self.consumption = 8.55
+        self.alert = False
         self.alert_counter = {'CHIPSET': 0, 'POWER': 0, 'TEMPERATURE': 0}
 
     def resetLocation(self):

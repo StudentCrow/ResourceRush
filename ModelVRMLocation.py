@@ -11,6 +11,7 @@ class ModelVRM:
         self.temperature = 0.0
         self.power = 0.0
         self.alert_percentage = 0
+        self.alert = False
         self.alert_counter = {'TEMPERATURE': 0, 'POWER': 0, 'VRM NW': 0}
         
     def resetLocation(self):
@@ -30,6 +31,7 @@ class ModelVRM:
         if self.power > 500.0 and self.alert_counter['VRM NW'] == 0:
             error = round(random(), 2)
             if error > 0.95:  # 5% chance for the error to trigger
+                self.alert = True
                 self.alert_counter['VRM NW'] += 1
                 self.power = 0.0
                 self.alert_percentage = 100
@@ -54,6 +56,7 @@ class ModelVRM:
                 if self.alert_percentage <= 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
                     if self.alert_percentage < 0: self.alert_percentage = 0
                     self.alert_counter['VRM NW'] -= 1
+                    self.alert = False
                     bit.subsystem = False
                     bit.FixCheck = False
             elif self.alert_counter['VRM NW'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task

@@ -11,6 +11,7 @@ class ModelGPU:
         self.graphics = 0.0
         self.consumption = 170.0
         self.alert_percentage = 0
+        self.alert = False
         self.alert_counter = {'GRAPHICS': 0, 'GRAPHICS NW': 0, 'POWER': 0, 'TEMPERATURE': 0}
 
     def resetLocation(self):
@@ -32,6 +33,7 @@ class ModelGPU:
         if self.graphics > 0.65 and self.alert_counter['GRAPHICS NW'] == 0:  # Activates with a 15% chance the GRAPHICS NW error if graphic usage abive 65%
             error = round(random(), 2)
             if error > 0.85:  # 15% chance for the error to trigger
+                self.alert = True
                 self.alert_counter['GRAPHICS NW'] += 1
                 self.alert_percentage += 100
                 self.graphics = 0.0
@@ -56,6 +58,7 @@ class ModelGPU:
                 if self.alert_percentage <= 0:  # If there is no more error to be fixed, it gets deleted and the bit exits the subsystem
                     self.alert_percentage = 0
                     self.alert_counter['GRAPHICS NW'] -= 1
+                    self.alert = False
                     bit.subsystem = False
                     bit.FixCheck = False
             elif self.alert_counter['GRAPHICS NW'] == 0 and bit.subsystem:  # In case there were more than one bit working to fix the error and it is already fixed, they get dismissed from the task
