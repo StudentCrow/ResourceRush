@@ -77,7 +77,7 @@ class ModelCPU:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, self.temperature, self.processes, alerts]
+        info = {'P':self.power, 'T':self.temperature, 'Pr':self.processes, 'A':alerts}
         return info
 
     def work(self):

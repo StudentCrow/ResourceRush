@@ -112,7 +112,7 @@ class ModelVENT:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, self.temperature, self.rpm, self.vent_num, alerts, self.alert_percentage]
+        info = {'P':self.power, 'T':self.temperature, 'R':self.rpm, 'VN':self.vent_num, 'A':alerts, 'AP':self.alert_percentage}
         return info
 
     def work(self):

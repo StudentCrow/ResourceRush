@@ -103,7 +103,7 @@ class ModelPERI:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, self.temperature, self.peri_num, alerts, self.alert_percentage]
+        info = {'P':self.power, 'T':self.temperature, 'PN':self.peri_num, 'A':alerts, 'AP':self.alert_percentage}
         return info
 
     def work(self):

@@ -24,7 +24,7 @@ class ViewLocation:
         screen.blit(text_image, text_rect)
 
     def showFont(self, screen, text):
-        info_font = pygame.font.SysFont('arial', round(self.size*0.25))
+        info_font = pygame.font.SysFont('arial', round(self.size*0.15))
         text_image = info_font.render(str(text), True, self.info_color)
         text_rect = text_image.get_rect(center=(self.x, self.y-self.size-15))
         screen.blit(text_image, text_rect)

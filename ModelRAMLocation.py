@@ -81,7 +81,7 @@ class ModelRAM:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, self.temperature, self.available_ram, alerts]
+        info = {'P':self.power, 'T':self.temperature, 'R':self.available_ram, 'A':alerts}
         return info
 
     def work(self):
