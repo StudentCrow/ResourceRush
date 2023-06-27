@@ -1,7 +1,3 @@
-import pygame
-from ModelOrder import ModelOrder
-
-
 class ModelBit:
     """
     Model part class that controls each individual bit
@@ -22,6 +18,7 @@ class ModelBit:
         self.y = y
         self.load = load
         self.limit = 100.0
+        self.idle = True
         self.GoToCheck = False
         self.FixCheck = False
         self.MineCheck = False
@@ -165,9 +162,6 @@ class ModelBit:
                     self.y += 10
             if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
                 self.GoToCheck = False
-        #Must be tweaked in order to adpat to any possible always going over the desired position situation
-        # elif not self.GoToCheck:
-        #     print('Go to order has not been given yet')
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:

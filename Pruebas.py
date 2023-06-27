@@ -1,5 +1,6 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
+from random import randrange, random
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
 from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; from ModelCPULocation import ModelCPU
@@ -118,6 +119,23 @@ def drawBits(viewer_bits, model_bits):
         bit.drawBit()
 
 
+def receiveOrderBits(viewer_bits, model_bits, ModelOrderBox):
+    for bit in viewer_bits:
+        if bit.bit_selected:
+            for model_bit in model_bits:
+                if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
+
+
+def idleBits(viewer_bits, model_bits):
+    for model_bit in model_bits:
+        if model_bit.idle:
+            chance = random()
+            if chance >= 0.5:
+                model_bit.x += randrange()
+            else:
+
+
+
 def createClock(timer):
     clock = ModelClock(timer)
     timer_event, clock_timer = clock.createClock()
@@ -134,7 +152,6 @@ def main():
 
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
-    first_pos = (int, int)
     viewer_bits, model_bits = loadBits(4, pos_bit, screen, view_locations)
 
     OrderBox = ViewOrder(screen_res)
@@ -145,12 +162,11 @@ def main():
     game_clock = ViewClock()
     game_clock_event, game_clock_timer = createClock(1000)
 
-
-
     run = True
     selection_on = False
     order_on = False
     send_order = False
+    first_pos = (int, int)
     while run:
         clock.tick(60)
         for event in pygame.event.get():
@@ -205,10 +221,7 @@ def main():
                     game_clock.minutes = 0; game_clock.hours += 1
         if ModelOrder.exists:
             if ModelOrderBox.send:
-                for bit in viewer_bits:
-                    if bit.bit_selected:
-                        for model_bit in model_bits:
-                            if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
+                receiveOrderBits(viewer_bits, model_bits, ModelOrderBox)
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
