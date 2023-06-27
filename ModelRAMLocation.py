@@ -52,7 +52,7 @@ class ModelRAM:
         elif self.ram_in_use > 2.0: self.temperature = self.consumption * (5.125 * (self.ram_in_use / 10)) + 40
 
     def powerManagement(self):
-        if self.power >= self.consumption and self.temperature < 81.0 and self.available_ram < 0.0:
+        if self.power >= self.consumption and self.temperature < 81.0 and self.available_ram > 0.0:
             if not self.functional: self.functional = True
             self.power -= self.consumption
             if self.power < 0: self.power = 0

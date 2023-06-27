@@ -87,7 +87,9 @@ class ModelPERI:
             self.resetLocation()
             
     def generateResource(self):
-        model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
+         if model_CHIPSET.chipset_power != 0:
+            model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
+            if model_CHIPSET.chipset_power < 0: model_CHIPSET.chipset_power = 0.0
 
     def getMined(self):
         return ''

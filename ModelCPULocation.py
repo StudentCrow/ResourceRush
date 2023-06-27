@@ -62,7 +62,9 @@ class ModelCPU:
         self.processes += randrange(1, 6)
 
     def getMined(self):
-        if self.functional: self.processes -= randrange(1, 3)
+        if self.functional and self.processes != 0:
+            self.processes -= randrange(1, 3)
+            if self.processes < 0: self.processes = 0.0
 
     def get_power(self, bit):    #Method for when a bit gives power to a location
         charge = bit.load

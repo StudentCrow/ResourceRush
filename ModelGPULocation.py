@@ -91,7 +91,9 @@ class ModelGPU:
             
     def getMined(self):
         if self.functional:
-            if self.alert_counter['GRAPHICS NW'] == 0: self.graphics -= round(uniform(0.005, 0.03), 2)
+            if self.alert_counter['GRAPHICS NW'] == 0 and self.graphics != 0:
+                self.graphics -= round(uniform(0.005, 0.03), 2)
+                if self.graphics < 0: self.graphics = 0.0
 
     def get_power(self, bit):    #Method for when a bit gives power to a location
         charge = bit.load

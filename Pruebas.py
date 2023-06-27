@@ -194,7 +194,6 @@ def main():
                     game_clock.seconds = 0; game_clock.minutes += 1
                 if game_clock.minutes == 60:
                     game_clock.minutes = 0; game_clock.hours += 1
-                print(game_clock.seconds, game_clock.minutes, game_clock.hours)
         if ModelOrder.exists:
             if ModelOrderBox.send:
                 for bit in viewer_bits:
