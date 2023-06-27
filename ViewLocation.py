@@ -12,7 +12,6 @@ class ViewLocation:
         self.info_color = (0, 0, 0)
         self.off_color = (255, 0, 0)
         self.on_color = (0, 255, 0)
-        self.collided_check = False
 
     def drawLocation(self, screen, functional = bool):
         if not functional:
@@ -31,7 +30,7 @@ class ViewLocation:
         screen.blit(text_image, text_rect)
 
     def checkLocationCollision(self, mouse_pos):
-        self.collided_check = pygame.Rect.collidepoint(self.loc_rect, mouse_pos)
+        return pygame.Rect.collidepoint(self.loc_rect, mouse_pos)
 
     def zoomLocation(self, direction):
         min_size = 100-40

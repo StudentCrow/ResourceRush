@@ -30,6 +30,21 @@ def loadLocations(screenx, screeny):
         exec(code)
     return view_locations, model_locations
 
+def loadBits(quantity, centerx, centery, screen):
+    center = [centerx, centery]
+    odd = quantity%2
+    number = int
+    viewer_bits = []
+    model_bits = []
+    if odd == 0:
+        number = quantity/2
+        for i in range(1, number+1):
+            var = i*20
+            
+    else:
+        number = quantity - odd
+
+
 def main():
     pygame.init()
     clock = pygame.time.Clock()
@@ -123,15 +138,18 @@ def main():
         for location in view_locations:
             for model_location in model_locations:
                 model_location.work()
-                location.checkLocationCollision(pygame.mouse.get_pos())
+                collision = location.checkLocationCollision(pygame.mouse.get_pos())
                 if location.name == model_location.name:
                     location.drawLocation(screen, model_location.functional)
-                    if location.collided_check:
+                    if collision:
                         location.showFont(screen, model_location.power)
         if model_bit_prueba.GoToCheck:
             model_bit_prueba.go_to(model_bit_prueba.loc)
             bit_prueba.x = model_bit_prueba.x
             bit_prueba.y = model_bit_prueba.y
+        bit_collision = bit_prueba.checkBitCollision(pygame.mouse.get_pos())
+        if bit_collision:
+            bit_prueba.showFont(model_bit_prueba.load)
         bit_prueba.drawBit()
         if selection_on:
             selection.drawSelection(screen)

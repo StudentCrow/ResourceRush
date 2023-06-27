@@ -30,26 +30,24 @@ class ModelBit:
     kill_counter = 0 #Counts which was the last bit to die
     instances = [] #Saves the instances of ModelBit
 
-    def __init__(self, name, locations, x=0, y=0, time=0.0, limit=100.0,
-                 subsystem=False, critic=False, load=0.0, goto=False, fix=False,
-                 mine=False, move=False):
+    def __init__(self, name, locations, x=0, y=0, load=0.0):
         ModelBit.counter += 1
 
         self.name = name
-        self.time = time    #Determines the remining lifetime of the bit
+        self.time = 0.0    #Determines the remining lifetime of the bit
         # self.working = working  #Boolean that indicates if the bit is currently working or in standby
-        self.subsystem = subsystem  #Boolean that indicates if the bit is working in a subsystem or not
-        self.critic = critic    #Boolean that indicates if the bit is in critic state or not
+        self.subsystem = False  #Boolean that indicates if the bit is working in a subsystem or not
+        self.critic = False    #Boolean that indicates if the bit is in critic state or not
         self.loc = 'BIOS'   #Location where the bit is currently positionated
         self.x = x
         self.y = y
         self.load = load
-        self.limit = limit
+        self.limit = 100.0
 
-        self.GoToCheck = goto
-        self.FixCheck = fix
-        self.MineCheck = mine
-        self.MoveCheck = move
+        self.GoToCheck = False
+        self.FixCheck = False
+        self.MineCheck = False
+        self.MoveCheck = False
         self.GetDestination = ''
         self.StoreDestination = ''
 
