@@ -47,7 +47,7 @@ class ModelATX:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, alerts]
+        info = {'P':self.power, 'A':alerts}
         return info
 
     def work(self):

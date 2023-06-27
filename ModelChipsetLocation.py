@@ -77,7 +77,7 @@ class ModelCHIPSET:
         alerts = 0
         for a in self.alert_counter:
             alerts += self.alert_counter[a]
-        info = [self.power, self.temperature, self.chipset_power, alerts]
+        info = {'P':self.power, 'T':self.temperature, 'CP':self.chipset_power, 'A':alerts}
         return info
 
     def work(self):
