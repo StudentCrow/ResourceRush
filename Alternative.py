@@ -244,7 +244,6 @@ def Settings():
     # Ventana
     window = pygame.display.set_mode(WINDOW_DIM)
     pygame.display.set_caption("SETTINGS")
-    window.fill(BLACK)
     # Administrador de interfaz
     manager = pygame_gui.UIManager(WINDOW_DIM)
     # Sonidos
@@ -291,7 +290,7 @@ def Settings():
     pygame.draw.polygon(window, RED, polygon_points)
     pygame.draw.polygon(window, BLACK, polygon_points, 5)
     pygame.display.update()
-
+    window.fill(BLACK)
 
     running = True
     clock = pygame.time.Clock()
