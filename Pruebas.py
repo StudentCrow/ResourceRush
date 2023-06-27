@@ -109,6 +109,15 @@ def loadBits(quantity, center, screen, view_locations):
     return viewer_bits, model_bits
 
 
+def drawBits(viewer_bits, model_bits):
+    for bit in viewer_bits:
+        bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
+        if bit_collision:
+            for model_bit in model_bits:
+                if model_bit.name == bit.name: bit.showFont(model_bit.load)
+        bit.drawBit()
+
+
 def createClock(timer):
     clock = ModelClock(timer)
     timer_event, clock_timer = clock.createClock()
@@ -209,12 +218,7 @@ def main():
                 model_bit.go_to(model_bit.loc)
                 for bit in viewer_bits:
                     if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
-        for bit in viewer_bits:
-            bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
-            if bit_collision:
-                for model_bit in model_bits:
-                    if model_bit.name == bit.name: bit.showFont(model_bit.load)
-            bit.drawBit()
+        drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)
         if not selection_on:
