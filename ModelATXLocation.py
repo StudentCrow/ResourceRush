@@ -40,6 +40,7 @@ class ModelATX:
     def getPower(self, name):  # Method for when a bit gives power to a location
         for bit in self.bit_list:
             if bit.name == name:
+                print('get')
                 charge = bit.load
                 self.power += charge
                 bit.load = 0
@@ -47,6 +48,7 @@ class ModelATX:
     def givePower(self, name):  # Method for when a bit gets power from a location
         for bit in self.bit_list:
             if bit.name == name:
+                print('give')
                 charge = bit.limit - bit.load
                 self.power -= charge
                 bit.load += charge

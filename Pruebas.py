@@ -33,10 +33,10 @@ def loadLocations(screenx, screeny):
     return view_locations, model_locations
 
 
-def updateLocations(view_locations, model_locations, screen):
+def updateLocations(view_locations, model_locations, screen, clock_event):
     for location in view_locations:
         for model_location in model_locations:
-            model_location.work()
+            if clock_event: model_location.work()
             collision = location.checkLocationCollision(pygame.mouse.get_pos())
             if location.name == model_location.name:
                 location.drawLocation(screen, model_location.functional, model_location.alert)
@@ -180,6 +180,9 @@ def main():
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
     viewer_bits, model_bits = loadBits(7, pos_bit, screen, model_locations)
+    for model_location in model_locations:
+        for model_bit in model_bits:
+            model_location.bit_list.append(model_bit)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)
@@ -257,7 +260,7 @@ def main():
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
-        updateLocations(view_locations, model_locations, screen)
+        updateLocations(view_locations, model_locations, screen, clock_event)
         executeOrderBits(viewer_bits, model_bits, clock_event)
         if clock_event: clock_event = False
         drawBits(viewer_bits, model_bits)

@@ -50,7 +50,6 @@ class ModelBit:
         if not self.subsystem:
             DecomposedOrd = Ord.split() #We get each word of the order into a new list
             numwords = len(DecomposedOrd)
-            print(self.GoToCheck)
             match numwords: #Determines what to deppending on the value of numwords
                 case 1: #Case when the order is mine
                     if not self.MineCheck and not self.GoToCheck and not self.MoveCheck:
