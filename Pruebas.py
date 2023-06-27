@@ -59,7 +59,7 @@ def loadBits(quantity, center, screen, view_locations):
             exec(code)
             code = 'viewer_bits.append(bit_'+str(name)+')'
             exec(code)
-            code = 'model_bit_'+str(name)+'=ModelBit("'+str(name)+'",view_locations,center[0]-var,center[1],var)'
+            code = 'model_bit_'+str(name)+'=ModelBit("'+str(name)+'",view_locations,center[0]-var,center[1])'
             exec(code)
             code = 'model_bits.append(model_bit_'+str(name)+')'
             exec(code)
@@ -68,7 +68,7 @@ def loadBits(quantity, center, screen, view_locations):
             exec(code)
             code = 'viewer_bits.append(bit_' + str(name) + ')'
             exec(code)
-            code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+            code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1])'
             exec(code)
             code = 'model_bits.append(model_bit_' + str(name) + ')'
             exec(code)
@@ -83,7 +83,7 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0],center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0],center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
@@ -93,7 +93,7 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]-var,center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]-var,center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
@@ -102,7 +102,7 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
@@ -126,7 +126,7 @@ def receiveOrderBits(viewer_bits, model_bits, ModelOrderBox):
                 if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
 
 
-def executeOrderBits(viewer_bits, model_bits):
+def executeOrderBits(viewer_bits, model_bits, clock_event):
     for model_bit in model_bits:
         if model_bit.GoToCheck and not model_bit.MoveCheck:
             model_bit.go_to(model_bit.loc)
@@ -136,6 +136,9 @@ def executeOrderBits(viewer_bits, model_bits):
             model_bit.move(model_bit.GetDestination, model_bit.StoreDestination)
             for bit in viewer_bits:
                 if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        elif model_bit.MineCheck and clock_event:
+            model_bit.mine(model_bit.loc)
+
 
 
 def idleBits(viewer_bits, model_bits):
@@ -191,6 +194,7 @@ def main():
     selection_on = False
     order_on = False
     send_order = False
+    clock_event = False
     first_pos = (int, int)
     while run:
         clock.tick(60)
@@ -239,6 +243,7 @@ def main():
                     for location in view_locations:
                         location.zoomLocation(event.y)
             if event.type == game_clock_event:
+                clock_event = True
                 game_clock.seconds += 1
                 if game_clock.seconds == 60:
                     game_clock.seconds = 0; game_clock.minutes += 1
@@ -253,7 +258,8 @@ def main():
 
         screen.fill((255, 255, 255))
         updateLocations(view_locations, model_locations, screen)
-        executeOrderBits(viewer_bits, model_bits)
+        executeOrderBits(viewer_bits, model_bits, clock_event)
+        if clock_event: clock_event = False
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)

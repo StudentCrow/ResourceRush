@@ -11,6 +11,7 @@ class ModelVRM:
         self.raw_power = 0.0
         self.temperature = 0.0
         self.power = 0.0
+        self.consumption = 5.0
         self.alert_percentage = 0
         self.alert = False
         self.alert_counter = {'TEMPERATURE': 0, 'POWER': 0, 'VRM NW': 0}
@@ -72,8 +73,9 @@ class ModelVRM:
         elif self.power > 100.0: self.temperature = 10.0 * (6.0 * (self.power / 1000.0)) + 60.0
 
     def powerManagement(self):
-        if self.temperature < 120.0:
+        if self.temperature < 120.0 and self.power >= self.consumption:
             if not self.functional: self.functional = True
+            self.power -= self.consumption
         else:
             self.resetLocation()
 
@@ -82,17 +84,20 @@ class ModelVRM:
             self.raw_power -= 100; self.power += 10
 
     def getMined(self):
-        if self.functional: self.generateResource()
+        self.generateResource()
 
-    def get_power(self, bit):    #Method for when a bit gives power to a location
-        charge = bit.load
-        self.power += charge
-        bit.load = 0
+    def getPower(self, name):  # Method for when a bit gives power to a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.load
+                self.raw_power += charge
+                bit.load = 0
 
-    def give_power(self, bit):  #Method for when a bit gets power from a location
-        charge = bit.limit - bit.load
-        self.power -= charge
-        bit.load += charge
+    def givePower(self, name):  # Method for when a bit gets power from a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.limit - bit.load
+                self.raw_power -= charge
 
     def updateLocInfo(self):
         alerts = 0

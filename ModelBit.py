@@ -1,3 +1,7 @@
+import pygame
+from pygame.locals import *
+
+
 class ModelBit:
     """
     Model part class that controls each individual bit
@@ -27,7 +31,7 @@ class ModelBit:
         self.GetDestination = ''
         self.StoreDestination = ''
         # List of hints of the orders a bit can get
-        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET P IN LOCATION', 'STORE RP IN LOCATION', 'MOVE P FROM LOCATION TO LOCATION']
+        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET P IN LOCATION', 'STORE P IN LOCATION', 'MOVE P FROM LOCATION TO LOCATION']
         # Complete orders that a bit can get:
         #    GO TO LOCATION, 3
         #    MINE, 1
@@ -45,15 +49,13 @@ class ModelBit:
     def receive_order(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
         if not self.subsystem:
             DecomposedOrd = Ord.split() #We get each word of the order into a new list
-            print(DecomposedOrd)
             numwords = len(DecomposedOrd)
-            print(numwords)
+            print(self.GoToCheck)
             match numwords: #Determines what to deppending on the value of numwords
                 case 1: #Case when the order is mine
                     if not self.MineCheck and not self.GoToCheck and not self.MoveCheck:
                         reference = self.OrdList[0]
-                        if reference == DecomposedOrd:
-                            self.idle = False
+                        if reference == DecomposedOrd[0]:
                             self.MineCheck = True
                         else:
                             #raise InvalidOrderError('INVALID ORDER')
@@ -170,14 +172,11 @@ class ModelBit:
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:
             destination.custom_alert(self.name) #We call to the custom_alert method from the given location
-        elif not self.FixCheck:
-            print('Fix order has not been given yet')
 
     def mine(self, destination):    #Method that gets a bit to start mining the location it is on at the moment
-        if self.MineCheck:
-            destination.get_mined(self.name)
-        elif not self.MineCheck:
-            print('Mine order has not been given yet')
+        for location in self.LocationList:
+            if location.name == destination:
+                location.getMined()
 
     def move(self, GetDestination, StoreDestination): #Method that moves a bit from one place to another carrying power from 1 to 2
         if not self.GoToCheck: self.GoToCheck = True
