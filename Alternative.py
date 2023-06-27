@@ -46,7 +46,7 @@ def Menu():
                     NewMission()
                 elif practice_rect_coord.collidepoint(event.pos):
                     print("Continuamos misión wacho.")
-                    # TODO crear practice
+                    # TODO ir hacia interfaz principal de juego
                 elif settings_rect_coord.collidepoint(event.pos):
                     print("Vas a bajarle la dificultad? Haha, cobarde.")
                     Settings()
@@ -57,7 +57,7 @@ def Menu():
                     running = False
                     sys.exit()
 
-def NewMission():       # TODO falta boton para atrás
+def NewMission():
     # Ventana
     window = pygame.display.set_mode(WINDOW_DIM)
     pygame.display.set_caption("New Mission")
@@ -74,6 +74,14 @@ def NewMission():       # TODO falta boton para atrás
         visible=True)
     text_entry.set_allowed_characters(abc)
     text_entry.set_text_length_limit(3)
+    # dibujo botón para volver al menú
+    window.fill(BLACK)
+    polygon_points = ([30, 60], [75, 30], [75, 90])
+    pygame.draw.polygon(window, RED, polygon_points)
+    pygame.draw.polygon(window, BLACK, polygon_points, 5)
+    # actualizo ventana
+    pygame.display.flip()
+
     # Bucle principal -----------------------------------------------------------
     running = True
     clock = pygame.time.Clock()
@@ -86,10 +94,16 @@ def NewMission():       # TODO falta boton para atrás
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     print("Ir hacia interfaz de juego") # TODO falta unión con la interfaz principal de juego
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if pygame.draw.polygon(window, BLACK, polygon_points).collidepoint(mouse_pos):
+                        Menu()
+                        running = False
+                        sys.exit()
 
             manager.process_events(event)
         manager.update(time_delta)
-        window.fill(BLACK)
         pygame.draw.rect(window, BLACK, title_rect_coord)
         window.blit(title_text, title_rect_coord)
         manager.draw_ui(window)
@@ -206,8 +220,8 @@ def Leaderboards():
 # ---------------------------------------------------------------------------------- DIBUJO BOTÓN PARA ATRÁS
     # dibujo botón para volver al menú
     polygon_points = ([30, 60], [75, 30], [75, 90])
-    pygame.draw.polygon(window, BLACK, polygon_points)
-    pygame.draw.polygon(window, RED, polygon_points, 5)
+    pygame.draw.polygon(window, RED, polygon_points)
+    pygame.draw.polygon(window, BLACK, polygon_points, 5)
 
     # actualizo ventana
     pygame.display.flip()
@@ -230,6 +244,7 @@ def Settings():
     # Ventana
     window = pygame.display.set_mode(WINDOW_DIM)
     pygame.display.set_caption("SETTINGS")
+    window.fill(BLACK)
     # Administrador de interfaz
     manager = pygame_gui.UIManager(WINDOW_DIM)
     # Sonidos
@@ -246,7 +261,6 @@ def Settings():
     subtitle_volume = font2.render("10-100", True, BLUE)
     title_resolution = font.render("Resolution", True, BLUE)
     subtitle_resolution = font2.render("900x680 or 1000x755", True, BLUE)
-
     # Cuadros de texto
     text_entry_fps = pygame_gui.elements.UITextEntryLine(
         relative_rect=pygame.Rect((WIDTH / 10, 0.57 * HEIGHT), (200, 50)))
@@ -275,25 +289,9 @@ def Settings():
     # dibujo botón para volver al menú
     polygon_points = ([30, 60], [75, 30], [75, 90])
     pygame.draw.polygon(window, RED, polygon_points)
-    pygame.draw.polygon(window, RED, polygon_points, 5)
+    pygame.draw.polygon(window, BLACK, polygon_points, 5)
     pygame.display.update()
-    window.fill(BLACK)
 
-    pygame.draw.rect(window, BLACK, settings_text_rect_coord)
-    pygame.draw.rect(window, BLACK, title_fps_rect_coord)
-    pygame.draw.rect(window, BLACK, subtitle_fps_rect_coord)
-    pygame.draw.rect(window, BLACK, title_volume_rect_coord)
-    pygame.draw.rect(window, BLACK, subtitle_volume_rect_coord)
-    pygame.draw.rect(window, BLACK, title_resolution_rect_coord)
-    pygame.draw.rect(window, BLACK, subtitle_resolution_rect_coord)
-
-    window.blit(settings_text, settings_text_rect_coord)
-    window.blit(title_fps, title_fps_rect_coord)
-    window.blit(subtitle_fps, subtitle_fps_rect_coord)
-    window.blit(title_volume, title_volume_rect_coord)
-    window.blit(subtitle_volume, subtitle_volume_rect_coord)
-    window.blit(title_resolution, title_resolution_rect_coord)
-    window.blit(subtitle_resolution, subtitle_resolution_rect_coord)
 
     running = True
     clock = pygame.time.Clock()
@@ -333,10 +331,24 @@ def Settings():
             manager.process_events(event)
         manager.update(time_delta)
 
+        pygame.draw.rect(window, BLACK, settings_text_rect_coord)
+        pygame.draw.rect(window, BLACK, title_fps_rect_coord)
+        pygame.draw.rect(window, BLACK, subtitle_fps_rect_coord)
+        pygame.draw.rect(window, BLACK, title_volume_rect_coord)
+        pygame.draw.rect(window, BLACK, subtitle_volume_rect_coord)
+        pygame.draw.rect(window, BLACK, title_resolution_rect_coord)
+        pygame.draw.rect(window, BLACK, subtitle_resolution_rect_coord)
+
+        window.blit(settings_text, settings_text_rect_coord)
+        window.blit(title_fps, title_fps_rect_coord)
+        window.blit(subtitle_fps, subtitle_fps_rect_coord)
+        window.blit(title_volume, title_volume_rect_coord)
+        window.blit(subtitle_volume, subtitle_volume_rect_coord)
+        window.blit(title_resolution, title_resolution_rect_coord)
+        window.blit(subtitle_resolution, subtitle_resolution_rect_coord)
         manager.draw_ui(window)
 
         pygame.display.update()
-
 
 Menu()
 pygame.quit()

@@ -1,10 +1,4 @@
-import pygame
-import sys
 from Imports import *
-from Viewer_Menu import *
-from Viewer_Leaderboards import *
-
-pygame.init()
 
 class Leaderboard: # TODO singular
     def __init__(self):
@@ -30,7 +24,7 @@ class Leaderboard: # TODO singular
 
 
 # ejemplo
-Leaderboards = Leaderboards()       # llamo a mi clase Leaderboards
+Leaderboards = Leaderboard()       # llamo a mi clase Leaderboards
 Leaderboards.set_scores(500)        # setteo valores
 Leaderboards.set_scores(800)
 Leaderboards.set_scores(300)

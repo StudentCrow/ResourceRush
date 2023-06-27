@@ -1,5 +1,5 @@
 from Imports import *
-from Viewer_Menu import *
+
 class Settings:
     value = 0
     def __init__(self):
