@@ -30,19 +30,69 @@ def loadLocations(screenx, screeny):
         exec(code)
     return view_locations, model_locations
 
-def loadBits(quantity, centerx, centery, screen):
-    center = [centerx, centery]
+def loadBits(quantity, center, screen, view_locations):
     odd = quantity%2
     number = int
     viewer_bits = []
     model_bits = []
     if odd == 0:
-        number = quantity/2
+        number = int(quantity/2)
+        name = 1
         for i in range(1, number+1):
-            var = i*20
-            
+            var = i*60
+            code = 'bit_'+str(name)+'=ViewerBit(screen,"'+str(name)+'",center[0]-var,center[1])'
+            exec(code)
+            code = 'viewer_bits.append(bit_'+str(name)+')'
+            exec(code)
+            code = 'model_bit_'+str(name)+'=ModelBit("'+str(name)+'",view_locations,center[0]-var,center[1],var)'
+            exec(code)
+            code = 'model_bits.append(model_bit_'+str(name)+')'
+            exec(code)
+            name += 1
+            code = 'bit_' + str(name) + '=ViewerBit(screen,"' + str(name) + '",center[0]+var,center[1])'
+            exec(code)
+            code = 'viewer_bits.append(bit_' + str(name) + ')'
+            exec(code)
+            code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+            exec(code)
+            code = 'model_bits.append(model_bit_' + str(name) + ')'
+            exec(code)
+            name += 1
     else:
-        number = quantity - odd
+        number = int((quantity/2)-0.5)
+        name = 1
+        for i in range(0, number+1):
+            var = i*60
+            if i == 0:
+                code = 'bit_' + str(name) + '=ViewerBit(screen,"' + str(name) + '",center[0],center[1])'
+                exec(code)
+                code = 'viewer_bits.append(bit_' + str(name) + ')'
+                exec(code)
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0],center[1],var)'
+                exec(code)
+                code = 'model_bits.append(model_bit_' + str(name) + ')'
+                exec(code)
+                name += 1
+            else:
+                code = 'bit_' + str(name) + '=ViewerBit(screen,"' + str(name) + '",center[0]-var,center[1])'
+                exec(code)
+                code = 'viewer_bits.append(bit_' + str(name) + ')'
+                exec(code)
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]-var,center[1],var)'
+                exec(code)
+                code = 'model_bits.append(model_bit_' + str(name) + ')'
+                exec(code)
+                name += 1
+                code = 'bit_' + str(name) + '=ViewerBit(screen,"' + str(name) + '",center[0]+var,center[1])'
+                exec(code)
+                code = 'viewer_bits.append(bit_' + str(name) + ')'
+                exec(code)
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+                exec(code)
+                code = 'model_bits.append(model_bit_' + str(name) + ')'
+                exec(code)
+                name += 1
+    return viewer_bits, model_bits
 
 
 def main():
@@ -55,11 +105,8 @@ def main():
 
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
-    model_bit_prueba = ModelBit("1", view_locations, pos_bit[0], pos_bit[1])
-
     first_pos = (int, int)
-    bit_prueba = ViewerBit(screen, pos_bit[0], pos_bit[1])
-    bit_prueba.drawBit()
+    viewer_bits, model_bits = loadBits(3, pos_bit, screen, view_locations)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)
@@ -102,7 +149,8 @@ def main():
                             send_order = False
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 if not selection_on and not order_on and not send_order:
-                    if bit_prueba.bit_selected: bit_prueba.bit_selected = False
+                    for bit in viewer_bits:
+                        if bit.bit_selected: bit.bit_selected = False
                     selection_on = True
                     first_pos = event.pos
                     selection = SelectionRectangle(event.pos)
@@ -117,21 +165,23 @@ def main():
             elif event.type == MOUSEMOTION:
                 if selection_on:
                     selection.updateSelection(event.pos)
-                    bit_prueba.checkBitSelection(first_pos, event.pos)
+                    for bit in viewer_bits:
+                        bit.checkBitSelection(first_pos, event.pos)
             elif event.type == MOUSEBUTTONUP and event.button == 1:
                 if selection_on:
                     selection_on = False
             elif event.type == MOUSEWHEEL:
                 if not selection_on:
-                    bit_prueba.zoomBit(event.y)
+                    for bit in viewer_bits:
+                        bit.zoomBit(event.y)
                     for location in view_locations:
                         location.zoomLocation(event.y)
         if ModelOrder.exists:
-            if ModelOrderBox.send and bit_prueba.bit_selected:
-                model_bit_prueba.receive_order(ModelOrderBox.text)
-                ModelOrder.exists = False
-            elif ModelOrderBox.send and not bit_prueba.bit_selected:
-                ModelOrderBox.text = ''
+            if ModelOrderBox.send:
+                for bit in viewer_bits:
+                    if bit.bit_selected:
+                        for model_bit in model_bits:
+                            if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
@@ -143,14 +193,18 @@ def main():
                     location.drawLocation(screen, model_location.functional)
                     if collision:
                         location.showFont(screen, model_location.power)
-        if model_bit_prueba.GoToCheck:
-            model_bit_prueba.go_to(model_bit_prueba.loc)
-            bit_prueba.x = model_bit_prueba.x
-            bit_prueba.y = model_bit_prueba.y
-        bit_collision = bit_prueba.checkBitCollision(pygame.mouse.get_pos())
-        if bit_collision:
-            bit_prueba.showFont(model_bit_prueba.load)
-        bit_prueba.drawBit()
+        for model_bit in model_bits:
+            if model_bit.GoToCheck:
+                model_bit.go_to(model_bit.loc)
+                for bit in viewer_bits:
+                    if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        for bit in viewer_bits:
+            bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
+            if bit_collision:
+                for model_bit in model_bits:
+                    if model_bit.name == bit.name: bit.showFont(model_bit.load)
+
+            bit.drawBit()
         if selection_on:
             selection.drawSelection(screen)
         if not selection_on:
