@@ -3,6 +3,7 @@ from ModelBit import ModelBit
 
 class ModelVRM:
     def __init__(self, name, x, y):
+        self.bit_list = []
         self.name = name
         self.x = x
         self.y = y

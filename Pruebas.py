@@ -126,6 +126,18 @@ def receiveOrderBits(viewer_bits, model_bits, ModelOrderBox):
                 if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
 
 
+def executeOrderBits(viewer_bits, model_bits):
+    for model_bit in model_bits:
+        if model_bit.GoToCheck and not model_bit.MoveCheck:
+            model_bit.go_to(model_bit.loc)
+            for bit in viewer_bits:
+                if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        elif model_bit.MoveCheck:
+            model_bit.move(model_bit.GetDestination, model_bit.StoreDestination)
+            for bit in viewer_bits:
+                if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+
+
 def idleBits(viewer_bits, model_bits):
     for model_bit in model_bits:
         if model_bit.idle:
@@ -164,7 +176,7 @@ def main():
 
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
-    viewer_bits, model_bits = loadBits(4, pos_bit, screen, view_locations)
+    viewer_bits, model_bits = loadBits(7, pos_bit, screen, model_locations)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)
@@ -241,11 +253,7 @@ def main():
 
         screen.fill((255, 255, 255))
         updateLocations(view_locations, model_locations, screen)
-        for model_bit in model_bits:
-            if model_bit.GoToCheck:
-                model_bit.go_to(model_bit.loc)
-                for bit in viewer_bits:
-                    if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        executeOrderBits(viewer_bits, model_bits)
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)

@@ -2,6 +2,7 @@ from random import *
 
 class ModelATX:
     def __init__(self, name, x, y):
+        self.bit_list = []
         self.name = name
         self.x = x
         self.y = y
@@ -36,13 +37,19 @@ class ModelATX:
     def getMined(self):
         self.generateResource()
 
-    def getPower(self, bit):    #Method for when a bit gives power to a location
-        return ''
+    def getPower(self, name):  # Method for when a bit gives power to a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.load
+                self.power += charge
+                bit.load = 0
 
-    def givePower(self, bit):  #Method for when a bit gets power from a location
-        charge = bit.limit - bit.load
-        self.power -= charge
-        bit.load += charge
+    def givePower(self, name):  # Method for when a bit gets power from a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.limit - bit.load
+                self.power -= charge
+                bit.load += charge
 
     def updateLocInfo(self):
         alerts = 0

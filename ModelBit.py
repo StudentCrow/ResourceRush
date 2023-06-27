@@ -31,7 +31,7 @@ class ModelBit:
         # Complete orders that a bit can get:
         #    GO TO LOCATION, 3
         #    MINE, 1
-        #    MOVE RESOURCE FROM LOCATION TO LOCATION, 5
+        #    MOVE RESOURCE FROM LOCATION TO LOCATION, 6
         #    FIX LOCATION, 2
         #    GET RESOURCE FROM LOCATION, 4
         #    STORE RESOURCE IN LOCATION, 4
@@ -45,12 +45,15 @@ class ModelBit:
     def receive_order(self, Ord):    #The variable Ord will be the order obtained from ModelOrder.CheckOrder
         if not self.subsystem:
             DecomposedOrd = Ord.split() #We get each word of the order into a new list
+            print(DecomposedOrd)
             numwords = len(DecomposedOrd)
+            print(numwords)
             match numwords: #Determines what to deppending on the value of numwords
                 case 1: #Case when the order is mine
                     if not self.MineCheck and not self.GoToCheck and not self.MoveCheck:
                         reference = self.OrdList[0]
                         if reference == DecomposedOrd:
+                            self.idle = False
                             self.MineCheck = True
                         else:
                             #raise InvalidOrderError('INVALID ORDER')
@@ -70,6 +73,7 @@ class ModelBit:
                                     #raise InvalidOrderError('CANT FIX A LOCATION FROM DISTANCE')
                                     return ''
                                 elif self.loc == destination:
+                                    self.idle = False
                                     self.MineCheck = False
                                     self.FixCheck = True
                                     self.subsystem = True
@@ -102,70 +106,66 @@ class ModelBit:
                         if GetReference[0] == DecomposedOrd[0] and GetReference[2] == DecomposedOrd[2]: #The order is a get
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
-                                #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
                                 return ''
                             else:
                                 if destination != self.loc:
                                     return ''
                                 else:
+                                    self.idle = False
                                     self.MineCheck = False
-                                    destination.give_power(self.name)
+                                    destination.givePower(self.name)
 
                         elif StoreReference[0] == DecomposedOrd[0] and StoreReference[2] == DecomposedOrd[2]: #The order is a store
                             destination = DecomposedOrd[3]
                             if destination not in self.LocationListNames:
-                                #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXIST')
                                 return ''
                             else:
                                 if destination != self.loc:
                                     return ''
                                 else:
+                                    self.idle = False
                                     self.MineCheck = False
-                                    destination.get_power(self.name)    #Method from ModelLocation that gets power from a bit
+                                    destination.getPower(self.name)    #Method from ModelLocation that gets power from a bit
                         else:
                             #raise InvalidOrderError('INVALID ORDER')
                             return ''
-                case 5: #Case when the order is move
+                case 6: #Case when the order is move
                     reference = self.OrdList[5].split()
-                    if reference[0] == DecomposedOrd[0] and reference[2] == DecomposedOrd[2] and  reference[4] == DecomposedOrd[4]:
+                    if reference[0] == DecomposedOrd[0] and reference[1] == DecomposedOrd[1] and reference[2] == DecomposedOrd[2] and  reference[4] == DecomposedOrd[4]:
                         get_destination = DecomposedOrd[3]
                         store_destination = DecomposedOrd[5]
                         if get_destination not in self.LocationListNames or store_destination not in self.LocationListNames:
-                            #raise InvalidLocationError('GIVEN LOCATION DOES NOT EXISTS')
                             return ''
                         else:
                             self.GetDestination = get_destination
                             self.loc = get_destination
                             self.StoreDestination = store_destination
+                            self.idle = False
                             self.MoveCheck = True
                     else:
-                        #raise InvalidOrderError('INVALID ORDER')
                         return ''
-                case _: #Raises custom error
+                case _:
                     return ''
-        # else:
-        #     raise InvalidOrderError('CANT RECEIVE AN ORDER WHILE IN A SUBSYSTEM')
 
     def go_to(self, destination): #Method that moves a bit to a designated location
-        if self.GoToCheck:
-            for location in self.LocationList:
-                if location.name == destination:
-                    new_x = location.x
-                    new_y = location.y
-            if self.x != new_x:
-                if new_x < self.x:
-                    self.x -= 10
-                elif new_x > self.x:
-                    self.x += 10
-            if self.y != new_y:
-                if new_y < self.y:
-                    self.y -= 10
-                elif new_y > self.y:
-                    self.y += 10
-            if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
-                self.center = [self.x, self.y]
-                self.GoToCheck = False
-                self.idle = True
+        for location in self.LocationList:
+            if location.name == destination:
+                new_x = location.x
+                new_y = location.y
+        if self.x != new_x:
+            if new_x < self.x:
+                self.x -= 10
+            elif new_x > self.x:
+                self.x += 10
+        if self.y != new_y:
+            if new_y < self.y:
+                self.y -= 10
+            elif new_y > self.y:
+                self.y += 10
+        if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
+            self.center = [self.x, self.y]
+            self.GoToCheck = False
+            self.idle = True
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:
@@ -180,15 +180,18 @@ class ModelBit:
             print('Mine order has not been given yet')
 
     def move(self, GetDestination, StoreDestination): #Method that moves a bit from one place to another carrying power from 1 to 2
-        if self.MoveCheck:
-            self.GoToCheck = True
-            if self.loc == GetDestination:  #Case when the bit is going to the location to get resources
-                self.go_to(GetDestination)
-                if not self.GoToCheck:
-                    GetDestination.give_power(self.name)
-                    self.loc = StoreDestination
-            elif self.loc == StoreDestination:  #Case when the bit is going to the location to store resources
-                self.go_to(StoreDestination)
-                if not self.GoToCheck:
-                    StoreDestination.get_power(self.name)
-                    self.loc = GetDestination
+        if not self.GoToCheck: self.GoToCheck = True
+        if self.loc == GetDestination:  #Case when the bit is going to the location to get resources
+            self.go_to(GetDestination)
+            if not self.GoToCheck:
+                for location in self.LocationList:
+                    if location.name == GetDestination:
+                        location.givePower(self.name)
+                self.loc = StoreDestination
+        elif self.loc == StoreDestination:  #Case when the bit is going to the location to store resources
+            self.go_to(StoreDestination)
+            if not self.GoToCheck:
+                for location in self.LocationList:
+                    if location.name == StoreDestination:
+                        location.getPower(self.name)
+                self.loc = GetDestination

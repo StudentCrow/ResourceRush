@@ -2,6 +2,7 @@ from random import *
 
 class ModelCPU:
     def __init__(self, name, x, y):
+        self.bit_list = []
         self.name = name
         self.x = x
         self.y = y
@@ -66,15 +67,19 @@ class ModelCPU:
             self.processes -= randrange(1, 3)
             if self.processes < 0: self.processes = 0.0
 
-    def get_power(self, bit):    #Method for when a bit gives power to a location
-        charge = bit.load
-        self.power += charge
-        bit.load = 0
+    def getPower(self, name):  # Method for when a bit gives power to a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.load
+                self.power += charge
+                bit.load = 0
 
-    def give_power(self, bit):  #Method for when a bit gets power from a location
-        charge = bit.limit - bit.load
-        self.power -= charge
-        bit.load += charge
+    def givePower(self, name):  # Method for when a bit gets power from a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.limit - bit.load
+                self.power -= charge
+                bit.load += charge
 
     def updateLocInfo(self):
         alerts = 0

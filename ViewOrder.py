@@ -4,7 +4,7 @@ from pygame.locals import *
 
 class ViewOrder:
     def __init__(self, screen_res):
-        self.font = pygame.font.SysFont('arial', 35)
+        self.font = pygame.font.SysFont('arial', 25)
         self.fill_color = (0, 0, 0)
         self.border_color = (255, 0, 0)
         self.collided_color = (0, 255, 0)
