@@ -18,28 +18,27 @@ class ModelCPU:
             if name == 'TEMPERATURE': self.alert_counter[name] = 0
 
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Random processes increase
-            self.generateResource()
-            ###
-            # Processes error
-            if self.processes >= 90.0 and self.alert_counter['PROCESSES'] == 0:
-                self.alert_counter['PROCESSES'] += 1
-            elif self.processes < 90.0 and self.alert_counter['PROCESSES'] != 0:
-                self.alert_counter['PROCESSES'] -= 1
-            ###
-            # Temperature error
-            if self.temperature >= 45.0 and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < 45.0 and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # raw_power error
-            if self.power <= 50 and self.alert_counter['power raw_power'] == 0:
-                self.alert_counter['power raw_power'] += 1
-            elif self.power > 50 and self.alert_counter['power raw_power'] != 0:
-                self.alert_counter['power raw_power'] -= 1
+        ###
+        # Random processes increase
+        self.generateResource()
+        ###
+        # Processes error
+        if self.processes >= 90.0 and self.alert_counter['PROCESSES'] == 0:
+            self.alert_counter['PROCESSES'] += 1
+        elif self.processes < 90.0 and self.alert_counter['PROCESSES'] != 0:
+            self.alert_counter['PROCESSES'] -= 1
+        ###
+        # Temperature error
+        if self.temperature >= 45.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 45.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # raw_power error
+        if self.power <= 50 and self.alert_counter['power raw_power'] == 0:
+            self.alert_counter['power raw_power'] += 1
+        elif self.power > 50 and self.alert_counter['power raw_power'] != 0:
+            self.alert_counter['power raw_power'] -= 1
 
     def customAlert(self, bit):
         if bit.subsystem:
@@ -47,9 +46,8 @@ class ModelCPU:
             bit.FixCheck = False
 
     def tempIncrease(self):
-        if self.functional:
-            if self.processes <= 20.0 and self.temperature < 30.0: self.temperature += 1.0
-            elif self.processes > 20.0: self.temperature = self.consumption * (1 * (self.processes / 100)) + 30
+        if self.processes <= 20.0 and self.temperature < 30.0: self.temperature += 1.0
+        elif self.processes > 20.0: self.temperature = self.consumption * (1 * (self.processes / 100)) + 30
 
     def powerManagement(self):
         if self.power >= self.consumption and self.temperature < 50.0:
@@ -57,7 +55,7 @@ class ModelCPU:
             self.power -= self.consumption
             if self.power < 0: self.power = 0
         else:
-            self.functional = True
+            self.resetLocation()
 
     def generateResource(self):
         self.processes += randrange(1, 6)
@@ -76,4 +74,7 @@ class ModelCPU:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

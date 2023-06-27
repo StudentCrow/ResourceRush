@@ -19,31 +19,30 @@ class ModelPERI:
             if name == 'TEMPERATURE': self.alert_counter[name] = 0
 
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Consume of chipset power
-            self.generateResource()
-            ###
-            # Random peripheral error
-            if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
-                error = round(random(), 2)
-                if error > 0.95:  # There's 5% chance of it triggering
-                    self.alert_counter['PERIPHERAL'] += 1
-                    self.peri_num -= 1.0
-                    self.alert_percentage += 100
-            ###
-            # Temperature error
-            if self.temperature >= 5.0 * self.peri_num and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < 5.0 * self.peri_num and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # Power error
-            if self.power <= 100.0 and self.alert_counter['POWER'] == 0:
-                self.alert_counter['POWER'] += 1
-            elif self.power > 100.0 and self.alert_counter['POWER'] != 0:
-                self.alert_counter['POWER'] -= 1
-            ###
+        ###
+        # Consume of chipset power
+        self.generateResource()
+        ###
+        # Random peripheral error
+        if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
+            error = round(random(), 2)
+            if error > 0.95:  # There's 5% chance of it triggering
+                self.alert_counter['PERIPHERAL'] += 1
+                self.peri_num -= 1.0
+                self.alert_percentage += 100
+        ###
+        # Temperature error
+        if self.temperature >= 5.0 * self.peri_num and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 5.0 * self.peri_num and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # Power error
+        if self.power <= 100.0 and self.alert_counter['POWER'] == 0:
+            self.alert_counter['POWER'] += 1
+        elif self.power > 100.0 and self.alert_counter['POWER'] != 0:
+            self.alert_counter['POWER'] -= 1
+        ###
             
     def customAlert(self, bit):
         if self.functional:
@@ -69,11 +68,10 @@ class ModelPERI:
             bit.FixCheck = False
             
     def tempIncrease(self):
-        if self.functional:
-            if model_CHIPSET.chipset_power > 0.0:
-                if self.temperature < 5.0 * self.peri_num:
-                    self.temperature += 0.2
-            else: self.temperature = 10.0 * self.peri_num
+        if model_CHIPSET.chipset_power > 0.0:
+            if self.temperature < 5.0 * self.peri_num:
+                self.temperature += 0.2
+        else: self.temperature = 10.0 * self.peri_num
             
     def powerManagement(self):
         if self.power >= self.consumption * self.peri_num:
@@ -86,10 +84,10 @@ class ModelPERI:
             self.resetLocation()
             
     def generateResource(self):
-        if self.functional: model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
+        model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
 
     def getMined(self):
-        if self.functional: return ''
+        return ''
 
     def get_power(self, bit):    #Method for when a bit gives power to a location
         charge = bit.load
@@ -102,4 +100,7 @@ class ModelPERI:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

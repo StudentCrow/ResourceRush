@@ -18,26 +18,25 @@ class ModelCHIPSET:
             if name != 'POWER': self.alert_counter[name] = 0
     
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Chipset output error
-            if self.chipset_power <= 30.0 and self.alert_counter['CHIPSET'] == 0:
-                self.alert_counter['CHIPSET'] += 1
-            elif self.chipset_power > 30.0 and self.alert_counter['CHIPSET'] != 0:
-                self.alert_counter['CHIPSET'] -= 1
-            ###
-            # Temperature error
-            if self.temperature >= 55.0 and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < 55.0 and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # Power error
-            if self.power <= 21.38 and self.alert_counter['POWER'] == 0:
-                self.alert_counter['POWER'] += 1
-            elif self.power > 21.38 and self.alert_counter['POWER'] != 0:
-                self.alert_counter['POWER'] -= 1
-            ###
+        ###
+        # Chipset output error
+        if self.chipset_power <= 30.0 and self.alert_counter['CHIPSET'] == 0:
+            self.alert_counter['CHIPSET'] += 1
+        elif self.chipset_power > 30.0 and self.alert_counter['CHIPSET'] != 0:
+            self.alert_counter['CHIPSET'] -= 1
+        ###
+        # Temperature error
+        if self.temperature >= 55.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 55.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # Power error
+        if self.power <= 21.38 and self.alert_counter['POWER'] == 0:
+            self.alert_counter['POWER'] += 1
+        elif self.power > 21.38 and self.alert_counter['POWER'] != 0:
+            self.alert_counter['POWER'] -= 1
+        ###
 
     def customAlert(self, bit):
         if bit.subsystem:
@@ -45,11 +44,10 @@ class ModelCHIPSET:
             bit.FixCheck = False
 
     def tempIncrease(self):
-        if self.functional:
-            if self.chipset_power <= 40.0: self.temperature += 1.0
-            else: self.temperature = self.consumption * ((self.chipset_power / 100.0) + 1.59) + 30.0
+        if self.chipset_power <= 40.0: self.temperature += 1.0
+        else: self.temperature = self.consumption * ((self.chipset_power / 100.0) + 1.59) + 30.0
 
-    def powerManagament(self):
+    def powerManagement(self):
         if self.power >= self.consumption and self.temperature <= 65.0:
             if not self.functional: self.functional = True
             variable_consumption = (self.chipset_power / 100) - 1.5
@@ -60,7 +58,7 @@ class ModelCHIPSET:
             self.resetLocation()
 
     def generateResource(self):
-        if self.functional: self.chipset_power += round(uniform(0.0, 3.0), 2)
+        self.chipset_power += round(uniform(0.0, 3.0), 2)
 
     def getMined(self):
         if self.functional: self.generateResource()
@@ -76,4 +74,7 @@ class ModelCHIPSET:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

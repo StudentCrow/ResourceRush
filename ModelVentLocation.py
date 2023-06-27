@@ -20,34 +20,33 @@ class ModelVENT:
             if name == 'TEMPERATURE': self.alert_counter[name] = 0
             
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Decrease of rpm
-            if self.rpm > 0:
-                self.rpm -= 15.0 * self.vent_num
-                if self.rpm < 0:
-                    self.rpm = 0
-            ###
-            # Vent error
-            if self.vent_num > 0:  # A vent error can happen only if there is at least 1 vent working
-                error = round(random(), 2)
-                if error > 0.95:  # 5% chance for the error to trigger
-                    self.alert_counter['VENT'] += 1
-                    self.vent_num -= 1.0
-                    self.alert_percentage += 100
-            ###
-            # Temperature error
-            if self.temperature >= -10.0 and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < -10.0 and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # Power error
-            if self.power <= 22.5 and self.alert_counter['POWER'] == 0:
-                self.alert_counter['POWER'] += 1
-            elif self.power > 22.5 and self.alert_counter['POWER'] != 0:
-                self.alert_counter['POWER'] -= 1
-            ###
+        ###
+        # Decrease of rpm
+        if self.rpm > 0:
+            self.rpm -= 15.0 * self.vent_num
+            if self.rpm < 0:
+                self.rpm = 0
+        ###
+        # Vent error
+        if self.vent_num > 0:  # A vent error can happen only if there is at least 1 vent working
+            error = round(random(), 2)
+            if error > 0.95:  # 5% chance for the error to trigger
+                self.alert_counter['VENT'] += 1
+                self.vent_num -= 1.0
+                self.alert_percentage += 100
+        ###
+        # Temperature error
+        if self.temperature >= -10.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < -10.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # Power error
+        if self.power <= 22.5 and self.alert_counter['POWER'] == 0:
+            self.alert_counter['POWER'] += 1
+        elif self.power > 22.5 and self.alert_counter['POWER'] != 0:
+            self.alert_counter['POWER'] -= 1
+        ###
             
     def customAlert(self, bit):
         if self.functional:
@@ -73,10 +72,9 @@ class ModelVENT:
             bit.FixCheck = False
 
     def tempIncrease(self):
-        if self.functional:
-            if self.rpm <= 2400.0:
-                if self.temperature > -30.0: self.temperature -= 1.0
-            else: self.temperature = -(self.consumption * (3.6 + self.rpm) + 30.0)
+        if self.rpm <= 2400.0:
+            if self.temperature > -30.0: self.temperature -= 1.0
+        else: self.temperature = -(self.consumption * (3.6 + self.rpm) + 30.0)
             
     def powerManagement(self):
         if self.power >= self.consumption * self.vent_num:
@@ -111,4 +109,7 @@ class ModelVENT:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

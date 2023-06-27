@@ -19,36 +19,35 @@ class ModelGPU:
             if name != 'GRAPHICS NW' or 'POWER': self.alert_counter[name] = 0
 
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Random increase of graphics usage between 0% and 10%
-            self.generateResource()
-            ###
-            # Graphics errors
-            if self.graphics >= 0.8 and self.alert_counter['GRAPHICS'] == 0:  # Activates the too much graphic usage alert
-                self.alert_counter['GRAPHICS'] += 1
-            elif self.graphics < 0.8 and self.alert_counter['GRAPHICS'] != 0:  # Deactivates the too much graphic usage alert
-                self.alert_counter['GRAPHICS'] -= 1
+        ###
+        # Random increase of graphics usage between 0% and 10%
+        self.generateResource()
+        ###
+        # Graphics errors
+        if self.graphics >= 0.8 and self.alert_counter['GRAPHICS'] == 0:  # Activates the too much graphic usage alert
+            self.alert_counter['GRAPHICS'] += 1
+        elif self.graphics < 0.8 and self.alert_counter['GRAPHICS'] != 0:  # Deactivates the too much graphic usage alert
+            self.alert_counter['GRAPHICS'] -= 1
 
-            if self.graphics > 0.65 and self.alert_counter['GRAPHICS NW'] == 0:  # Activates with a 15% chance the GRAPHICS NW error if graphic usage abive 65%
-                error = round(random(), 2)
-                if error > 0.85:  # 15% chance for the error to trigger
-                    self.alert_counter['GRAPHICS NW'] += 1
-                    self.alert_percentage += 100
-                    self.graphics = 0.0
-            ###
-            # Temperature error
-            if self.temperature >= 93.0 and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < 93.0 and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # Power error
-            if self.power <= 425.0 and self.alert_counter['POWER'] == 0:
-                self.alert_counter['POWER'] += 1
-            elif self.power > 425.0 and self.alert_counter['POWER'] != 0:
-                self.alert_counter['POWER'] -= 1
-            ###
+        if self.graphics > 0.65 and self.alert_counter['GRAPHICS NW'] == 0:  # Activates with a 15% chance the GRAPHICS NW error if graphic usage abive 65%
+            error = round(random(), 2)
+            if error > 0.85:  # 15% chance for the error to trigger
+                self.alert_counter['GRAPHICS NW'] += 1
+                self.alert_percentage += 100
+                self.graphics = 0.0
+        ###
+        # Temperature error
+        if self.temperature >= 93.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 93.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # Power error
+        if self.power <= 425.0 and self.alert_counter['POWER'] == 0:
+            self.alert_counter['POWER'] += 1
+        elif self.power > 425.0 and self.alert_counter['POWER'] != 0:
+            self.alert_counter['POWER'] -= 1
+        ###
             
     def customAlert(self, bit):
         if self.functional:
@@ -67,13 +66,12 @@ class ModelGPU:
             bit.FixCheck = False
 
     def tempIncrease(self):
-        if self.functional:
-            if self.graphics <= 0.89:
-                if self.temperature < 75.0: self.temperature += 1.0
-            else:
-                self.temperature = self.consumption * (self.graphics - 0.89) + 75.0
+        if self.graphics <= 0.89:
+            if self.temperature < 75.0: self.temperature += 1.0
+        else:
+            self.temperature = self.consumption * (self.graphics - 0.89) + 75.0
 
-    def powerManagament(self):
+    def powerManagement(self):
         if self.power >= self.consumption:
             if not self.functional: self.functional = True
             variable_consumption = self.graphics - 0.9
@@ -103,4 +101,7 @@ class ModelGPU:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

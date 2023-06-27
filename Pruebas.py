@@ -106,7 +106,7 @@ def main():
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
     first_pos = (int, int)
-    viewer_bits, model_bits = loadBits(3, pos_bit, screen, view_locations)
+    viewer_bits, model_bits = loadBits(8, pos_bit, screen, view_locations)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)

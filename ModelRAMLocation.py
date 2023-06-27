@@ -19,28 +19,27 @@ class ModelRAM:
             if name != 'POWER': self.alert_counter[name] = 0
     
     def manageAlerts(self):
-        if self.functional:
-            ###
-            # Random use of ram
-            self.generateResource()
-            ###
-            # Ram error
-            if self.available_ram <= 2.0 and self.alert_counter['RAM'] == 0:
-                self.alert_counter['RAM'] += 1
-            elif self.available_ram > 2.0 and self.alert_counter['RAM'] != 0:
-                self.alert_counter['RAM'] -= 1
-            ###
-            # Temperature error
-            if self.temperature >= 70.0 and self.alert_counter['TEMPERATURE'] == 0:
-                self.alert_counter['TEMPERATURE'] += 1
-            elif self.temperature < 70.0 and self.alert_counter['TEMPERATURE'] != 0:
-                self.alert_counter['TEMPERATURE'] -= 1
-            ###
-            # Power error
-            if self.power <= 12.5 and self.alert_counter['POWER'] == 0:
-                self.alert_counter['POWER'] += 1
-            elif self.power > 12.5 and self.alert_counter['POWER'] != 0:
-                self.alert_counter['POWER'] -= 1
+        ###
+        # Random use of ram
+        self.generateResource()
+        ###
+        # Ram error
+        if self.available_ram <= 2.0 and self.alert_counter['RAM'] == 0:
+            self.alert_counter['RAM'] += 1
+        elif self.available_ram > 2.0 and self.alert_counter['RAM'] != 0:
+            self.alert_counter['RAM'] -= 1
+        ###
+        # Temperature error
+        if self.temperature >= 70.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 70.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # Power error
+        if self.power <= 12.5 and self.alert_counter['POWER'] == 0:
+            self.alert_counter['POWER'] += 1
+        elif self.power > 12.5 and self.alert_counter['POWER'] != 0:
+            self.alert_counter['POWER'] -= 1
             ###
 
     def customAlert(self, bit):
@@ -48,9 +47,8 @@ class ModelRAM:
         bit.FixCheck = False
 
     def tempIncrease(self):
-        if self.functional:
-            if self.ram_in_use <= 2.0 and self.temperature < 40.0: self.temperature += 1.0
-            elif self.ram_in_use > 2.0: self.temperature = self.consumption * (5.125 * (self.ram_in_use / 10)) + 40
+        if self.ram_in_use <= 2.0 and self.temperature < 40.0: self.temperature += 1.0
+        elif self.ram_in_use > 2.0: self.temperature = self.consumption * (5.125 * (self.ram_in_use / 10)) + 40
 
     def powerManagement(self):
         if self.power >= self.consumption and self.temperature < 81.0:
@@ -80,4 +78,7 @@ class ModelRAM:
         bit.load += charge
 
     def work(self):
-        return ''
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()

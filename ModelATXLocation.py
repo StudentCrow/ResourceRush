@@ -44,5 +44,5 @@ class ModelATX:
         bit.load += charge
 
     def work(self):
-        self.powerManagement()
         self.manageAlerts()
+        self.powerManagement()
