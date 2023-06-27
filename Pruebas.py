@@ -105,6 +105,8 @@ def loadBits(quantity, center, screen, view_locations):
                 name += 1
     return viewer_bits, model_bits
 
+def createClock():
+    pass
 
 def main():
     pygame.init()

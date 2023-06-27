@@ -1,25 +1,5 @@
 import pygame
 from ModelOrder import ModelOrder
-class InvalidOrderError(Exception):
-    """
-    Custom error that gets executed when the given order to the bit is not valid
-    """
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
-
-
-class InvalidLocationError(Exception):
-    """
-    Custom error that gets executed when the given location to the bit is not valid
-    """
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
 
 
 class ModelBit:
@@ -34,8 +14,7 @@ class ModelBit:
         ModelBit.counter += 1
 
         self.name = name
-        self.time = 0.0    #Determines the remining lifetime of the bit
-        # self.working = working  #Boolean that indicates if the bit is currently working or in standby
+        #self.time = 0.0    #Determines the remining lifetime of the bit
         self.subsystem = False  #Boolean that indicates if the bit is working in a subsystem or not
         self.critic = False    #Boolean that indicates if the bit is in critic state or not
         self.loc = 'BIOS'   #Location where the bit is currently positionated
@@ -43,16 +22,14 @@ class ModelBit:
         self.y = y
         self.load = load
         self.limit = 100.0
-
         self.GoToCheck = False
         self.FixCheck = False
         self.MineCheck = False
         self.MoveCheck = False
         self.GetDestination = ''
         self.StoreDestination = ''
-
         # List of hints of the orders a bit can get
-        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET RESOURCE IN LOCATION', 'STORE RESOURCE IN LOCATION', 'MOVE RESOURCE FROM LOCATION TO LOCATION']
+        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET P IN LOCATION', 'STORE RP IN LOCATION', 'MOVE P FROM LOCATION TO LOCATION']
         # Complete orders that a bit can get:
         #    GO TO LOCATION, 3
         #    MINE, 1
@@ -60,23 +37,10 @@ class ModelBit:
         #    FIX LOCATION, 2
         #    GET RESOURCE FROM LOCATION, 4
         #    STORE RESOURCE IN LOCATION, 4
-
-        # List of the valid locations
-        # It will have to be the list obtained with the determined objects of ModelLocation
-        # For now it will remain as it is, here is the code example for the LocationList made in main code:
-        # Locations = [ModelLocation('PERI'), ModelLocation('VRM'), ModelLocation('RAM'),
-        #            ModelLocation('ATX'), ModelLocation('CPU'), ModelLocation('DISK'),
-        #            ModelLocation('CLK'), ModelLocation('BIOS'), ModelLocation('CHIPSET'),
-        #            ModelLocation('GPU'), ModelLocation('VENT')]
-        # LocList = []
-        # for location in Locations:
-        #    LocList.append(location.name)
         self.LocationList = locations
         self.LocationListNames = []
         for i in self.LocationList:
             self.LocationListNames.append(i.name)
-        #['PERI', 'VRM', 'RAM', 'ATX', 'CPU', 'DISK', 'CLK', 'BIOS', 'CHIPSET', 'GPU', 'VENT']
-
         self.__class__.instances.append(self)
 
     #Function that checks if an order is real and calls for the correct method
@@ -230,70 +194,3 @@ class ModelBit:
                 if not self.GoToCheck:
                     StoreDestination.get_power(self.name)
                     self.loc = GetDestination
-        # elif not self.MoveCheck:
-        #     print('Move order has not been given yet')
-
-def main():
-    """Pruebas funcionamiento de órden go to"""
-    # Uno = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
-    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
-    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
-    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
-    # print(' Prueba bit 1 \n')
-    # print(Uno.loc)
-    # Uno.GoToCheck(Uno.loc)
-    # Uno.ReceiveOrder('GO TO ATX')
-    # print(Uno.loc)
-    # while (Uno.go_to):
-    #     Uno.GoToCheck(Uno.loc)
-    #     print(Uno.x)
-    #     print(Uno.y)
-    #     print(Uno.go_to)
-    #
-    # Dos = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
-    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
-    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
-    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
-    # print('\n Prueba bit 2 \n')
-    # print(Dos.loc)
-    # Dos.ReceiveOrder('GO TO BIOS')
-    # print(Dos.loc)
-    # Dos.GoToCheck(Dos.go_to)
-    #
-    # Tres = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
-    #                 ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
-    #                 ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40), ModelLocation('CHIPSET', -30, -30),
-    #                 ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
-    # print('\n Prueba bit 3 \n')
-    # print(Tres.loc)
-    # Tres.ReceiveOrder('GO TO GPU')
-    # print(Tres.loc)
-    # while (Tres.go_to):
-    #     Tres.GoToCheck(Tres.loc)
-    #     print(Tres.x)
-    #     print(Tres.y)
-    #     print(Tres.go_to)
-    #
-    # Cuatr = ModelBit([ModelLocation('PERI', 10, 10), ModelLocation('VRM', 20, 20), ModelLocation('RAM', 30, 30),
-    #                  ModelLocation('ATX', 40, 40), ModelLocation('CPU', 50, 50), ModelLocation('DISK', 0, 0),
-    #                  ModelLocation('CLK', -50, -50), ModelLocation('BIOS', -40, -40),
-    #                  ModelLocation('CHIPSET', -30, -30),
-    #                  ModelLocation('GPU', -20, -20), ModelLocation('VENT', -10, -10)])
-    # print('\n Prueba bit 4 \n')
-    # print(Cuatr.loc)
-    # Cuatr.ReceiveOrder('GO TO RAM')
-    # print(Cuatr.loc)
-    # i = 0
-    # while (Cuatr.go_to):
-    #     if i == 2:
-    #         Cuatr.ReceiveOrder('GO TO CLK')
-    #     Cuatr.GoToCheck(Cuatr.loc)
-    #     print(Cuatr.x)
-    #     print(Cuatr.y)
-    #     print(Cuatr.go_to)
-    #     i += 1
-
-
-
-# if __name__ == "__main__":
-#     main()
