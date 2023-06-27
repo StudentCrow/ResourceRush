@@ -1,6 +1,6 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
-from random import randrange, random
+from random import random
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
 from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; from ModelCPULocation import ModelCPU
@@ -148,7 +148,6 @@ def idleBits(viewer_bits, model_bits):
                     bit.x = model_bit.x; bit.y = model_bit.y
 
 
-
 def createClock(timer):
     clock = ModelClock(timer)
     timer_event, clock_timer = clock.createClock()
@@ -174,6 +173,7 @@ def main():
 
     game_clock = ViewClock()
     game_clock_event, game_clock_timer = createClock(1000)
+    idle_clock_event, idle_clock_timer = createClock(75)
 
     run = True
     selection_on = False
@@ -232,6 +232,8 @@ def main():
                     game_clock.seconds = 0; game_clock.minutes += 1
                 if game_clock.minutes == 60:
                     game_clock.minutes = 0; game_clock.hours += 1
+            if event.type == idle_clock_event:
+                idleBits(viewer_bits, model_bits)
         if ModelOrder.exists:
             if ModelOrderBox.send:
                 receiveOrderBits(viewer_bits, model_bits, ModelOrderBox)
@@ -244,7 +246,6 @@ def main():
                 model_bit.go_to(model_bit.loc)
                 for bit in viewer_bits:
                     if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
-        idleBits(viewer_bits, model_bits)
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)
