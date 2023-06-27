@@ -30,6 +30,17 @@ def loadLocations(screenx, screeny):
         exec(code)
     return view_locations, model_locations
 
+def updateLocations(view_locations, model_locations, screen):
+    for location in view_locations:
+        for model_location in model_locations:
+            model_location.work()
+            collision = location.checkLocationCollision(pygame.mouse.get_pos())
+            if location.name == model_location.name:
+                location.drawLocation(screen, model_location.functional)
+                if collision:
+                    info = model_location.updateLocInfo()
+                    location.showFont(screen, info)
+
 def loadBits(quantity, center, screen, view_locations):
     odd = quantity%2
     number = int
@@ -106,7 +117,7 @@ def main():
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
     first_pos = (int, int)
-    viewer_bits, model_bits = loadBits(8, pos_bit, screen, view_locations)
+    viewer_bits, model_bits = loadBits(4, pos_bit, screen, view_locations)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)
@@ -185,14 +196,7 @@ def main():
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
-        for location in view_locations:
-            for model_location in model_locations:
-                model_location.work()
-                collision = location.checkLocationCollision(pygame.mouse.get_pos())
-                if location.name == model_location.name:
-                    location.drawLocation(screen, model_location.functional)
-                    if collision:
-                        location.showFont(screen, model_location.power)
+        updateLocations(view_locations, model_locations, screen)
         for model_bit in model_bits:
             if model_bit.GoToCheck:
                 model_bit.go_to(model_bit.loc)
@@ -203,7 +207,6 @@ def main():
             if bit_collision:
                 for model_bit in model_bits:
                     if model_bit.name == bit.name: bit.showFont(model_bit.load)
-
             bit.drawBit()
         if selection_on:
             selection.drawSelection(screen)

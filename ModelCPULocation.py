@@ -73,6 +73,13 @@ class ModelCPU:
         self.power -= charge
         bit.load += charge
 
+    def updateLocInfo(self):
+        alerts = 0
+        for a in self.alert_counter:
+            alerts += self.alert_counter[a]
+        info = [self.power, self.temperature, self.processes, alerts]
+        return info
+
     def work(self):
         if self.functional:
             self.manageAlerts()
