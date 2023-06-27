@@ -16,6 +16,7 @@ class ModelBit:
         self.loc = 'BIOS'   #Location where the bit is currently positionated
         self.x = x
         self.y = y
+        self.center = [x, y]
         self.load = load
         self.limit = 100.0
         self.idle = True
@@ -87,6 +88,7 @@ class ModelBit:
                                 return ''
                             else:
                                 self.loc = destination
+                                self.idle = False
                                 self.MineCheck = False
                                 self.MoveCheck = False
                                 self.GoToCheck = True
@@ -161,7 +163,9 @@ class ModelBit:
                 elif new_y > self.y:
                     self.y += 10
             if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
+                self.center = [self.x, self.y]
                 self.GoToCheck = False
+                self.idle = True
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:

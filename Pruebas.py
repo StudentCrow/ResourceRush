@@ -131,8 +131,21 @@ def idleBits(viewer_bits, model_bits):
         if model_bit.idle:
             chance = random()
             if chance >= 0.5:
-                model_bit.x += randrange()
+                model_bit.x += 1
+                if model_bit.x > model_bit.center[0] + 15: model_bit.x -= 1
             else:
+                model_bit.x -= 1
+                if model_bit.x < model_bit.center[0]-15: model_bit.x += 1
+            chance = random()
+            if chance >= 0.5:
+                model_bit.y += 1
+                if model_bit.y > model_bit.center[1] + 15: model_bit.y -= 1
+            else:
+                model_bit.y -= 1
+                if model_bit.y < model_bit.center[1] - 15: model_bit.y += 1
+            for bit in viewer_bits:
+                if bit.name == model_bit.name:
+                    bit.x = model_bit.x; bit.y = model_bit.y
 
 
 
@@ -231,6 +244,7 @@ def main():
                 model_bit.go_to(model_bit.loc)
                 for bit in viewer_bits:
                     if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        idleBits(viewer_bits, model_bits)
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)
