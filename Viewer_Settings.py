@@ -16,7 +16,7 @@ def Settings():
     title_fps = font.render("Fps", True, BLUE)
     subtitle_fps = font2.render("30/60/90/120", True, BLUE)
     title_volume = font.render("Volume", True, BLUE)
-    subtitle_volume = font2.render("10-100", True, BLUE)
+    subtitle_volume = font2.render("ON/OFF", True, BLUE)
     title_resolution = font.render("Resolution", True, BLUE)
     subtitle_resolution = font2.render("900x680 or 1000x755", True, BLUE)
 
@@ -44,6 +44,7 @@ def Settings():
     subtitle_volume_rect_coord = subtitle_volume.get_rect(center=(4 * WIDTH / 5, 0.55 * HEIGHT))
     title_resolution_rect_coord = title_resolution.get_rect(center=(WIDTH / 2, 0.7 * HEIGHT))
     subtitle_resolution_rect_coord = subtitle_resolution.get_rect(center=(WIDTH / 2, 0.75 * HEIGHT))
+
     running = True
     clock = pygame.time.Clock()
     while running:
@@ -62,19 +63,14 @@ def Settings():
                     if event.key == pygame.K_RETURN:
                         text = text_entry_volume.get_text()
                         if text == "10" or "20" or "30" or "40" or "50" or "60" or "70" or "80" or "90" or "100":
-                            sound2.play()
+                            sound3.play()
                             text_entry_volume.set_text("")
                 if text_entry_resolution.is_focused:
                     if event.key == pygame.K_RETURN:
                         text = text_entry_resolution.get_text()
                         if text == "1800x755" or "900x680":
-                            sound3.play()
+                            sound2.play()
                             text_entry_resolution.set_text("")
-
-
-
-
-
             manager.process_events(event)
         manager.update(time_delta)
 
@@ -101,4 +97,5 @@ def Settings():
         pygame.display.update()
 
 Settings()
+
 pygame.quit()

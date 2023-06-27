@@ -139,5 +139,4 @@ def Leaderboards():
                         Menu()
                         run = False
 
-
 pygame.quit()

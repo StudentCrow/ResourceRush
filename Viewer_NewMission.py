@@ -36,5 +36,4 @@ def NewMission():
         manager.draw_ui(window)
         pygame.display.update()
 
-
 pygame.quit()

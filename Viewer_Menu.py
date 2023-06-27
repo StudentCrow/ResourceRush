@@ -1,7 +1,5 @@
 from Imports import *
-from Viewer_NewMission import *
 from Viewer_Settings import *
-from Viewer_Leaderboards import *
 pygame.init()
 def Menu():
     # creación ventana y título
@@ -37,26 +35,24 @@ def Menu():
 
     pygame.display.flip()
 
-    # BUCLE MAIN
-    running = True
-    while running:
+    # BUCLE
+    run = True
+    while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if new_mission_rect_coord.collidepoint(event.pos):
                     print("Empezamos misión wachín.")
-                    NewMission()
                 elif practice_rect_coord.collidepoint(event.pos):
                     print("Continuamos misión wacho.")
                 elif settings_rect_coord.collidepoint(event.pos):
                     print("Vas a bajarle la dificultad? Haha, cobarde.")
-                    Settings()
                 elif leaderboards_rect_coord.collidepoint(event.pos):
                     print("Mejor ni lo mires, que eres el último.")
-                    Leaderboards()
                 elif quit_game_rect_coord.collidepoint(event.pos):
                     running = False
+                    sys.exit()
 
-Menu()
 pygame.quit()
