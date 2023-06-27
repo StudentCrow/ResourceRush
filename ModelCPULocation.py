@@ -1,0 +1,87 @@
+from random import *
+
+class ModelCPU:
+    def __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.functional = False
+        self.temperature = 0.0
+        self.power = 0.0
+        self.processes = 0.0
+        self.consumption = 20.0
+        self.alert_counter = {'power raw_power': 0, 'TEMPERATURE': 0, 'PROCESSES': 0}
+
+    def resetLocation(self):
+        self.functional = False; self.temperature = 0.0
+        for name in self.alert_counter:
+            if name == 'TEMPERATURE': self.alert_counter[name] = 0
+
+    def manageAlerts(self):
+        ###
+        # Random processes increase
+        self.generateResource()
+        ###
+        # Processes error
+        if self.processes >= 90.0 and self.alert_counter['PROCESSES'] == 0:
+            self.alert_counter['PROCESSES'] += 1
+        elif self.processes < 90.0 and self.alert_counter['PROCESSES'] != 0:
+            self.alert_counter['PROCESSES'] -= 1
+        ###
+        # Temperature error
+        if self.temperature >= 45.0 and self.alert_counter['TEMPERATURE'] == 0:
+            self.alert_counter['TEMPERATURE'] += 1
+        elif self.temperature < 45.0 and self.alert_counter['TEMPERATURE'] != 0:
+            self.alert_counter['TEMPERATURE'] -= 1
+        ###
+        # raw_power error
+        if self.power <= 50 and self.alert_counter['power raw_power'] == 0:
+            self.alert_counter['power raw_power'] += 1
+        elif self.power > 50 and self.alert_counter['power raw_power'] != 0:
+            self.alert_counter['power raw_power'] -= 1
+
+    def customAlert(self, bit):
+        if bit.subsystem:
+            bit.subsystem = False
+            bit.FixCheck = False
+
+    def tempIncrease(self):
+        if self.processes <= 20.0 and self.temperature < 30.0: self.temperature += 1.0
+        elif self.processes > 20.0: self.temperature = self.consumption * (1 * (self.processes / 100)) + 30
+
+    def powerManagement(self):
+        if self.power >= self.consumption and self.temperature < 50.0:
+            if not self.functional: self.functional = True
+            self.power -= self.consumption
+            if self.power < 0: self.power = 0
+        else:
+            self.resetLocation()
+
+    def generateResource(self):
+        self.processes += randrange(1, 6)
+
+    def getMined(self):
+        if self.functional: self.processes -= randrange(1, 3)
+
+    def get_power(self, bit):    #Method for when a bit gives power to a location
+        charge = bit.load
+        self.power += charge
+        bit.load = 0
+
+    def give_power(self, bit):  #Method for when a bit gets power from a location
+        charge = bit.limit - bit.load
+        self.power -= charge
+        bit.load += charge
+
+    def updateLocInfo(self):
+        alerts = 0
+        for a in self.alert_counter:
+            alerts += self.alert_counter[a]
+        info = [self.power, self.temperature, self.processes, alerts]
+        return info
+
+    def work(self):
+        if self.functional:
+            self.manageAlerts()
+            self.tempIncrease()
+        self.powerManagement()
