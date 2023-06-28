@@ -1,5 +1,10 @@
+import MainProgram
 from Imports import *
+from MainProgram import *
+
 def Menu():
+    pygame.init()
+    clock = pygame.time.Clock()
     # creación ventana y título
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Resource Rush")
@@ -36,6 +41,7 @@ def Menu():
     # BUCLE
     run = True
     while run:
+        clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -47,6 +53,7 @@ def Menu():
                 elif practice_rect_coord.collidepoint(event.pos):
                     print("Continuamos misión wacho.")
                     # TODO ir hacia interfaz principal de juego
+                    MainProgram.main()
                 elif settings_rect_coord.collidepoint(event.pos):
                     print("Vas a bajarle la dificultad? Haha, cobarde.")
                     Settings()

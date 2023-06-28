@@ -1,4 +1,4 @@
-# Imports
+
 import pygame, pygame_gui, sys, os
 pygame.init()
 
