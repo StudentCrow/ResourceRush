@@ -123,8 +123,8 @@ class ModelVENT:
         info = {'P':self.power, 'T':self.temperature, 'R':self.rpm, 'VN':self.vent_num, 'A':alerts, 'AP':self.alert_percentage}
         return info
 
-    def work(self):
+    def work(self, loc_event):
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        self.powerManagement()
+        if loc_event == 3: self.powerManagement()

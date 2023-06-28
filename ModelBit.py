@@ -6,13 +6,9 @@ class ModelBit:
     """
     Model part class that controls each individual bit
     """
-    counter = 0 #Counts the number of bits existing
-    kill_counter = 0 #Counts which was the last bit to die
     instances = [] #Saves the instances of ModelBit
 
     def __init__(self, name, locations, x=0, y=0, load=0.0):
-        ModelBit.counter += 1
-
         self.name = name
         #self.time = 0.0    #Determines the remining lifetime of the bit
         self.subsystem = False  #Boolean that indicates if the bit is working in a subsystem or not
@@ -31,7 +27,7 @@ class ModelBit:
         self.GetDestination = ''
         self.StoreDestination = ''
         # List of hints of the orders a bit can get
-        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET P IN LOCATION', 'STORE P IN LOCATION', 'MOVE P FROM LOCATION TO LOCATION']
+        self.OrdList = ['MINE', 'FIX', 'GO TO', 'GET P FROM LOCATION', 'STORE P IN LOCATION', 'MOVE P FROM LOCATION TO LOCATION']
         # Complete orders that a bit can get:
         #    GO TO LOCATION, 3
         #    MINE, 1
@@ -93,7 +89,6 @@ class ModelBit:
                                 return ''
                             else:
                                 self.loc = destination
-                                self.idle = False
                                 self.MineCheck = False
                                 self.MoveCheck = False
                                 self.GoToCheck = True
@@ -112,9 +107,9 @@ class ModelBit:
                                 if destination != self.loc:
                                     return ''
                                 else:
-                                    self.idle = False
                                     self.MineCheck = False
-                                    destination.givePower(self.name)
+                                    for loc in self.LocationList:
+                                        if loc.name == destination: loc.givePower(self.name)
 
                         elif StoreReference[0] == DecomposedOrd[0] and StoreReference[2] == DecomposedOrd[2]: #The order is a store
                             destination = DecomposedOrd[3]
@@ -124,9 +119,9 @@ class ModelBit:
                                 if destination != self.loc:
                                     return ''
                                 else:
-                                    self.idle = False
                                     self.MineCheck = False
-                                    destination.getPower(self.name)    #Method from ModelLocation that gets power from a bit
+                                    for loc in self.LocationList:
+                                        if loc.name == destination: loc.getPower(self.name)
                         else:
                             #raise InvalidOrderError('INVALID ORDER')
                             return ''
@@ -141,7 +136,6 @@ class ModelBit:
                             self.GetDestination = get_destination
                             self.loc = get_destination
                             self.StoreDestination = store_destination
-                            self.idle = False
                             self.MoveCheck = True
                     else:
                         return ''
@@ -149,24 +143,25 @@ class ModelBit:
                     return ''
 
     def go_to(self, destination): #Method that moves a bit to a designated location
+        if self.idle: self.idle = False
         for location in self.LocationList:
             if location.name == destination:
                 new_x = location.x
                 new_y = location.y
-        if self.x != new_x:
-            if new_x < self.x:
-                self.x -= 10
-            elif new_x > self.x:
-                self.x += 10
-        if self.y != new_y:
-            if new_y < self.y:
-                self.y -= 10
-            elif new_y > self.y:
-                self.y += 10
-        if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
-            self.center = [self.x, self.y]
-            self.GoToCheck = False
-            self.idle = True
+                if self.x != new_x:
+                    if new_x < self.x:
+                        self.x -= 10
+                    elif new_x > self.x:
+                        self.x += 10
+                if self.y != new_y:
+                    if new_y < self.y:
+                        self.y -= 10
+                    elif new_y > self.y:
+                        self.y += 10
+                if new_x-new_x*0.05 <= self.x <= new_x+new_x*0.05 and new_y-new_y*0.05 <= self.y <= new_y+new_y*0.05:
+                    self.center = [self.x, self.y]
+                    self.GoToCheck = False
+                    self.idle = True
 
     def fix(self, destination): #Method that gets a bit into the subsystem of a given location to fix it
         if self.FixCheck:

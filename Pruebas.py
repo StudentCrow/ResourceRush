@@ -33,13 +33,13 @@ def loadLocations(screenx, screeny):
     return view_locations, model_locations
 
 
-def updateLocations(view_locations, model_locations, screen, clock_event):
+def updateLocations(view_locations, model_locations, screen, clock_event, loc_event):
     for location in view_locations:
         for model_location in model_locations:
-            if clock_event: model_location.work()
+            if clock_event: model_location.work(loc_event)
             collision = location.checkLocationCollision(pygame.mouse.get_pos())
             if location.name == model_location.name:
-                location.drawLocation(screen, model_location.functional, model_location.alert)
+                location.drawLocation(screen, model_location.functional, model_location.alert_counter, model_location.alert)
                 if collision:
                     info = model_location.updateLocInfo()
                     location.showFont(screen, info)
@@ -198,6 +198,7 @@ def main():
     order_on = False
     send_order = False
     clock_event = False
+    loc_event = 0
     first_pos = (int, int)
     while run:
         clock.tick(60)
@@ -247,6 +248,7 @@ def main():
                         location.zoomLocation(event.y)
             if event.type == game_clock_event:
                 clock_event = True
+                loc_event += 1
                 game_clock.seconds += 1
                 if game_clock.seconds == 60:
                     game_clock.seconds = 0; game_clock.minutes += 1
@@ -260,9 +262,10 @@ def main():
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
-        updateLocations(view_locations, model_locations, screen, clock_event)
+        updateLocations(view_locations, model_locations, screen, clock_event, loc_event)
         executeOrderBits(viewer_bits, model_bits, clock_event)
         if clock_event: clock_event = False
+        if loc_event == 3: loc_event = 0
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)

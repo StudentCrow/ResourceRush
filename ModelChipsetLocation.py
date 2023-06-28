@@ -86,8 +86,8 @@ class ModelCHIPSET:
         info = {'P':self.power, 'T':self.temperature, 'CP':self.chipset_power, 'A':alerts}
         return info
 
-    def work(self):
+    def work(self, loc_event):
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        self.powerManagement()
+        if loc_event == 3: self.powerManagement()

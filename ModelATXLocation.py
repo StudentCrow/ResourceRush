@@ -60,6 +60,6 @@ class ModelATX:
         info = {'P':self.power, 'A':alerts}
         return info
 
-    def work(self):
+    def work(self, loc_event):
         self.manageAlerts()
         self.powerManagement()
