@@ -36,13 +36,23 @@ def loadLocations(screenx, screeny):
 def updateLocations(view_locations, model_locations, screen, clock_event, loc_event):
     for location in view_locations:
         for model_location in model_locations:
-            if clock_event: model_location.work(loc_event)
             collision = location.checkLocationCollision(pygame.mouse.get_pos())
             if location.name == model_location.name:
                 location.drawLocation(screen, model_location.functional, model_location.alert_counter, model_location.alert)
                 if collision:
                     info = model_location.updateLocInfo()
                     location.showFont(screen, info)
+    for model_location in model_locations:
+        chipset = model_location
+        if clock_event:
+            if model_location.name == "PERI":
+                for model in model_locations:
+                    if model.name == "CHIPSET":
+                        chipset = model
+                        break
+                model_location.work(loc_event, chipset)
+            else:
+                model_location.work(loc_event)
 
 
 def loadBits(quantity, center, screen, view_locations):

@@ -20,10 +20,10 @@ class ModelPERI:
         for name in self.alert_counter:
             if name == 'TEMPERATURE': self.alert_counter[name] = 0
 
-    def manageAlerts(self):
+    def manageAlerts(self, model_CHIPSET):
         ###
         # Consume of chipset power
-        self.generateResource()
+        self.generateResource(model_CHIPSET)
         ###
         # Random peripheral error
         if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
@@ -71,19 +71,19 @@ class ModelPERI:
                 else:
                     bit.FixCheck = False
             
-    def tempIncrease(self):
+    def tempIncrease(self, model_CHIPSET):
         if model_CHIPSET.chipset_power > 0.0:
             if self.temperature < 5.0 * self.peri_num:
                 self.temperature += 0.2
         else: self.temperature = 10.0 * self.peri_num
             
-    def powerManagement(self):
+    def powerManagement(self, model_CHIPSET):
         variable_consumption = (1.0 - (model_CHIPSET.chipset_power / 100))
         if variable_consumption < 0: variable_consumption = 0
         self.power -= (self.consumption * variable_consumption) * self.peri_num + self.consumption * self.peri_num
         if self.power < 0: self.power = 0
             
-    def generateResource(self):
+    def generateResource(self, model_CHIPSET):
          if model_CHIPSET.chipset_power != 0:
             model_CHIPSET.chipset_power -= round(uniform(0.0, 2.0), 2)*self.peri_num
             if model_CHIPSET.chipset_power < 0: model_CHIPSET.chipset_power = 0.0
@@ -112,12 +112,12 @@ class ModelPERI:
         info = {'P':self.power, 'T':self.temperature, 'PN':self.peri_num, 'A':alerts, 'AP':self.alert_percentage}
         return info
 
-    def work(self, loc_event):
+    def work(self, loc_event, model_CHIPSET):
         if self.functional:
-            self.manageAlerts()
-            self.tempIncrease()
+            self.manageAlerts(model_CHIPSET)
+            self.tempIncrease(model_CHIPSET)
         if self.power >= self.consumption * self.peri_num:
             if not self.functional: self.functional = True
-            if loc_event == 10: self.powerManagement()
+            if loc_event == 10: self.powerManagement(model_CHIPSET)
         else:
             if self.functional: self.resetLocation()
