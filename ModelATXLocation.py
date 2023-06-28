@@ -32,7 +32,7 @@ class ModelATX:
         if self.power > 4500: self.resetLocation()
 
     def generateResource(self):
-        self.power += round(uniform(25.0, 50.0), 2)
+        self.power += round(uniform(50.0, 100.0), 2)
 
     def getMined(self):
         self.generateResource()
