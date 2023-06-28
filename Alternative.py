@@ -4,7 +4,7 @@ def Menu():
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Resource Rush")
     # fuente texto
-    font = pygame.font.SysFont("Showcard Gothic", 45)
+    font = pygame.font.SysFont("msgothic", 45)
     # cargar fondo e imagen
     img_background = pygame.image.load("img/ResourceRushMenu.png")
     new_mission_text = font.render("New Mission", True, BLUE)
