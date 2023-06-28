@@ -38,7 +38,7 @@ def Menu():
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                run = False
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if new_mission_rect_coord.collidepoint(event.pos):
@@ -54,7 +54,7 @@ def Menu():
                     print("Mejor ni lo mires, que eres el último.")
                     Leaderboards()
                 elif quit_game_rect_coord.collidepoint(event.pos):
-                    running = False
+                    run = False
                     sys.exit()
 
 def NewMission():

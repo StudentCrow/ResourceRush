@@ -26,7 +26,7 @@ class Settings:
 settings = Settings()
 volum = settings.set_volume(50)
 resolution = settings.set_resolution(1250)
-fps = settings.set_fps(75)
+fps = settings.set_fps(60)
 settings.apply_settings()
 
 pygame.quit()
