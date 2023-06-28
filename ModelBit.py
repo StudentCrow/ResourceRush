@@ -6,7 +6,6 @@ class ModelBit:
     def __init__(self, name, locations, x=0, y=0, load=0.0):
         self.name = name
         #self.time = 0.0    #Determines the remining lifetime of the bit
-        self.critic = False    #Boolean that indicates if the bit is in critic state or not
         self.loc = 'BIOS'   #Location where the bit is currently positionated
         self.x = x
         self.y = y
