@@ -2,11 +2,13 @@ from random import *
 
 class ModelATX:
     def __init__(self, name, x, y):
+        self.bit_list = []
         self.name = name
         self.x = x
         self.y = y
         self.functional = True
         self.power = 0.0
+        self.alert = False
         self.alert_counter = {'STORED POWER': 0}
 
     def resetLocation(self):
@@ -21,27 +23,33 @@ class ModelATX:
             self.alert_counter['STORED POWER'] -= 1
         ###
 
-    def customAlert(self, bit):
-        if bit.subsystem:
-            bit.subsystem = False
-            bit.FixCheck = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if bit.FixCheck: bit.FixCheck = False
 
     def powerManagement(self):
         if self.power > 4500: self.resetLocation()
 
     def generateResource(self):
-        self.power += round(uniform(10.0, 15.0), 2)
+        self.power += round(uniform(50.0, 100.0), 2)
 
     def getMined(self):
         self.generateResource()
 
-    def getPower(self, bit):    #Method for when a bit gives power to a location
-        return ''
+    def getPower(self, name):  # Method for when a bit gives power to a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.load
+                self.power += charge
+                bit.load = 0
 
-    def givePower(self, bit):  #Method for when a bit gets power from a location
-        charge = bit.limit - bit.load
-        self.power -= charge
-        bit.load += charge
+    def givePower(self, name):  # Method for when a bit gets power from a location
+        for bit in self.bit_list:
+            if bit.name == name:
+                charge = bit.limit - bit.load
+                self.power -= charge
+                bit.load += charge
 
     def updateLocInfo(self):
         alerts = 0
@@ -50,6 +58,6 @@ class ModelATX:
         info = {'P':self.power, 'A':alerts}
         return info
 
-    def work(self):
+    def work(self, loc_event):
         self.manageAlerts()
         self.powerManagement()

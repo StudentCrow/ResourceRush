@@ -9,12 +9,16 @@ class ViewerBit:
         self.size = size
         self.fill_color = fill_color
         self.border_color = (0, 0, 0)
+        self.fixing_color = (0, 0, 255)
         self.bit_selected = False
 
     #Function to draw the full bit
-    def drawBit(self):
+    def drawBit(self, fixing):
         pygame.draw.rect(self.display, self.fill_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 0)
-        pygame.draw.rect(self.display, self.border_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 5)
+        if fixing:
+            pygame.draw.rect(self.display, self.fixing_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 5)
+        else:
+            pygame.draw.rect(self.display, self.border_color, (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 5)
         if self.bit_selected:
             pygame.draw.rect(self.display, (255, 255, 0), (self.x-self.size/2, self.y-self.size/2, self.size, self.size), 2)
 

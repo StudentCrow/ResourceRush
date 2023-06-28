@@ -1,11 +1,13 @@
 import pygame, pygame.surfarray
 from pygame.locals import *
+from random import random
 from Viewer_Bit import ViewerBit; from ModelBit import ModelBit
 from ViewLocation import ViewLocation
 from ModelATXLocation import ModelATX; from ModelGPULocation import ModelGPU; from ModelCPULocation import ModelCPU
 from ModelPeriLocation import ModelPERI; from ModelRAMLocation import ModelRAM; from ModelVentLocation import ModelVENT
 from ModelVRMLocation import ModelVRM; from ModelChipsetLocation import ModelCHIPSET
 from ViewOrder import ViewOrder; from ModelOrder import ModelOrder
+from ViewClock import  ViewClock; from ModelClock import  ModelClock
 from SelectionRectangle import SelectionRectangle
 
 
@@ -30,16 +32,28 @@ def loadLocations(screenx, screeny):
         exec(code)
     return view_locations, model_locations
 
-def updateLocations(view_locations, model_locations, screen):
+
+def updateLocations(view_locations, model_locations, screen, clock_event, loc_event):
     for location in view_locations:
         for model_location in model_locations:
-            model_location.work()
             collision = location.checkLocationCollision(pygame.mouse.get_pos())
             if location.name == model_location.name:
-                location.drawLocation(screen, model_location.functional)
+                location.drawLocation(screen, model_location.functional, model_location.alert_counter, model_location.alert)
                 if collision:
                     info = model_location.updateLocInfo()
                     location.showFont(screen, info)
+    for model_location in model_locations:
+        chipset = model_location
+        if clock_event:
+            if model_location.name == "PERI":
+                for model in model_locations:
+                    if model.name == "CHIPSET":
+                        chipset = model
+                        break
+                model_location.work(loc_event, chipset)
+            else:
+                model_location.work(loc_event)
+
 
 def loadBits(quantity, center, screen, view_locations):
     odd = quantity%2
@@ -55,7 +69,7 @@ def loadBits(quantity, center, screen, view_locations):
             exec(code)
             code = 'viewer_bits.append(bit_'+str(name)+')'
             exec(code)
-            code = 'model_bit_'+str(name)+'=ModelBit("'+str(name)+'",view_locations,center[0]-var,center[1],var)'
+            code = 'model_bit_'+str(name)+'=ModelBit("'+str(name)+'",view_locations,center[0]-var,center[1])'
             exec(code)
             code = 'model_bits.append(model_bit_'+str(name)+')'
             exec(code)
@@ -64,7 +78,7 @@ def loadBits(quantity, center, screen, view_locations):
             exec(code)
             code = 'viewer_bits.append(bit_' + str(name) + ')'
             exec(code)
-            code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+            code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1])'
             exec(code)
             code = 'model_bits.append(model_bit_' + str(name) + ')'
             exec(code)
@@ -79,7 +93,7 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0],center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0],center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
@@ -89,7 +103,7 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]-var,center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]-var,center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
@@ -98,12 +112,75 @@ def loadBits(quantity, center, screen, view_locations):
                 exec(code)
                 code = 'viewer_bits.append(bit_' + str(name) + ')'
                 exec(code)
-                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1],var)'
+                code = 'model_bit_' + str(name) + '=ModelBit("' + str(name) + '",view_locations,center[0]+var,center[1])'
                 exec(code)
                 code = 'model_bits.append(model_bit_' + str(name) + ')'
                 exec(code)
                 name += 1
     return viewer_bits, model_bits
+
+
+def drawBits(viewer_bits, model_bits):
+    for bit in viewer_bits:
+        Fixing = False
+        bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
+        for model_bit in model_bits:
+            if model_bit.name == bit.name:
+                if bit_collision: bit.showFont(model_bit.load)
+                Fixing = model_bit.FixCheck
+        bit.drawBit(Fixing)
+
+
+def receiveOrderBits(viewer_bits, model_bits, ModelOrderBox):
+    for bit in viewer_bits:
+        if bit.bit_selected:
+            for model_bit in model_bits:
+                if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
+
+
+def executeOrderBits(viewer_bits, model_bits, clock_event):
+    for model_bit in model_bits:
+        if model_bit.GoToCheck and not model_bit.MoveCheck:
+            model_bit.go_to(model_bit.loc)
+            for bit in viewer_bits:
+                if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        elif model_bit.MoveCheck:
+            model_bit.move(model_bit.GetDestination, model_bit.StoreDestination)
+            for bit in viewer_bits:
+                if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
+        elif model_bit.MineCheck and clock_event:
+            model_bit.mine(model_bit.loc)
+        elif model_bit.FixCheck and clock_event:
+            model_bit.fix(model_bit.loc)
+
+
+
+def idleBits(viewer_bits, model_bits):
+    for model_bit in model_bits:
+        if model_bit.idle:
+            chance = random()
+            if chance >= 0.5:
+                model_bit.x += 1
+                if model_bit.x > model_bit.center[0] + 15: model_bit.x -= 1
+            else:
+                model_bit.x -= 1
+                if model_bit.x < model_bit.center[0]-15: model_bit.x += 1
+            chance = random()
+            if chance >= 0.5:
+                model_bit.y += 1
+                if model_bit.y > model_bit.center[1] + 15: model_bit.y -= 1
+            else:
+                model_bit.y -= 1
+                if model_bit.y < model_bit.center[1] - 15: model_bit.y += 1
+            for bit in viewer_bits:
+                if bit.name == model_bit.name:
+                    bit.x = model_bit.x; bit.y = model_bit.y
+
+
+def createClock(timer):
+    clock = ModelClock(timer)
+    timer_event, clock_timer = clock.createClock()
+    return timer_event, clock_timer
 
 
 def main():
@@ -116,23 +193,27 @@ def main():
 
     view_locations, model_locations = loadLocations(screen_res.current_w, screen_res.current_h)
     pos_bit = screen.get_rect().center
-    first_pos = (int, int)
-    viewer_bits, model_bits = loadBits(4, pos_bit, screen, view_locations)
+    viewer_bits, model_bits = loadBits(7, pos_bit, screen, model_locations)
+    for model_location in model_locations:
+        for model_bit in model_bits:
+            model_location.bit_list.append(model_bit)
 
     OrderBox = ViewOrder(screen_res)
     OrderBox.drawOrder(screen)
 
     pygame.display.update()
 
-    # counter = 30
-    # timer = 1000
-    # timer_event = pygame.USEREVENT + 1
-    # pygame.time.set_timer(timer_event, timer)
+    game_clock = ViewClock()
+    game_clock_event, game_clock_timer = createClock(1000)
+    idle_clock_event, idle_clock_timer = createClock(75)
 
     run = True
     selection_on = False
     order_on = False
     send_order = False
+    clock_event = False
+    loc_event = 0
+    first_pos = (int, int)
     while run:
         clock.tick(60)
         for event in pygame.event.get():
@@ -145,14 +226,6 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
-                # elif event.key == pygame.K_LEFT:
-                #     if not left and not model_bit_prueba.GoToCheck:
-                #         left = True
-                #         model_bit_prueba.GoToCheck = True
-                # elif event.key == pygame.K_RIGHT:
-                #     if not right and not model_bit_prueba.GoToCheck:
-                #         right = True
-                #         model_bit_prueba.GoToCheck = True
                 else:
                     if send_order:
                         ModelOrderBox.getOrder(event)
@@ -187,27 +260,27 @@ def main():
                         bit.zoomBit(event.y)
                     for location in view_locations:
                         location.zoomLocation(event.y)
+            if event.type == game_clock_event:
+                clock_event = True
+                loc_event += 1
+                game_clock.seconds += 1
+                if game_clock.seconds == 60:
+                    game_clock.seconds = 0; game_clock.minutes += 1
+                if game_clock.minutes == 60:
+                    game_clock.minutes = 0; game_clock.hours += 1
+            if event.type == idle_clock_event:
+                idleBits(viewer_bits, model_bits)
         if ModelOrder.exists:
             if ModelOrderBox.send:
-                for bit in viewer_bits:
-                    if bit.bit_selected:
-                        for model_bit in model_bits:
-                            if model_bit.name == bit.name: model_bit.receive_order(ModelOrderBox.text);
+                receiveOrderBits(viewer_bits, model_bits, ModelOrderBox)
                 ModelOrder.exists = False
 
         screen.fill((255, 255, 255))
-        updateLocations(view_locations, model_locations, screen)
-        for model_bit in model_bits:
-            if model_bit.GoToCheck:
-                model_bit.go_to(model_bit.loc)
-                for bit in viewer_bits:
-                    if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
-        for bit in viewer_bits:
-            bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
-            if bit_collision:
-                for model_bit in model_bits:
-                    if model_bit.name == bit.name: bit.showFont(model_bit.load)
-            bit.drawBit()
+        updateLocations(view_locations, model_locations, screen, clock_event, loc_event)
+        executeOrderBits(viewer_bits, model_bits, clock_event)
+        if clock_event: clock_event = False
+        if loc_event == 10: loc_event = 0
+        drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)
         if not selection_on:
@@ -215,6 +288,7 @@ def main():
         OrderBox.drawOrder(screen)
         if send_order:
             OrderBox.drawOrderText(ModelOrderBox.text, screen, ModelOrderBox)
+        game_clock.drawClock(screen)
         pygame.display.update()
     pygame.quit()
 

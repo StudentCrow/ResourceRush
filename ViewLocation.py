@@ -12,19 +12,29 @@ class ViewLocation:
         self.info_color = (0, 0, 0)
         self.off_color = (255, 0, 0)
         self.on_color = (0, 255, 0)
+        self.warning_color= (255, 165, 0)
+        self.alert_color = (255, 0, 255)
 
-    def drawLocation(self, screen, functional = bool):
+    def drawLocation(self, screen, functional, alert_counter, alert=False):
+        warnings = 0
+        for a in alert_counter:
+            warnings += alert_counter[a]
         if not functional:
             pygame.draw.rect(screen, self.off_color, self.loc_rect)
         else:
-            pygame.draw.rect(screen, self.on_color, self.loc_rect)
+            if warnings == 0:
+                pygame.draw.rect(screen, self.on_color, self.loc_rect)
+            else:
+                pygame.draw.rect(screen, self.warning_color, self.loc_rect)
+        if alert:
+            pygame.draw.rect(screen, self.alert_color, self.loc_rect, 10)
         font = pygame.font.SysFont('arial', round(self.size*0.35))
         text_image = font.render(self.name, True, self.text_color)
         text_rect = text_image.get_rect(center=self.loc_rect.center)
         screen.blit(text_image, text_rect)
 
     def showFont(self, screen, text):
-        info_font = pygame.font.SysFont('arial', round(self.size*0.25))
+        info_font = pygame.font.SysFont('arial', round(self.size*0.15))
         text_image = info_font.render(str(text), True, self.info_color)
         text_rect = text_image.get_rect(center=(self.x, self.y-self.size-15))
         screen.blit(text_image, text_rect)
