@@ -27,7 +27,7 @@ class ModelPERI:
         ###
         # Random peripheral error
         if self.peri_num > 0 and model_CHIPSET.chipset_power < 25.0:  # A peripheral error cna happen only if there is at least 1 peripheral working and there is low chipset power
-            error = round(random(), 2)
+            error = random()
             if error > 0.95:  # There's 5% chance of it triggering
                 if not self.alert: self.alert = True
                 self.alert_counter['PERIPHERAL'] += 1
@@ -47,29 +47,29 @@ class ModelPERI:
             self.alert_counter['POWER'] -= 1
         ###
             
-    def customAlert(self, bit):
-        if self.functional:
-            if self.alert_counter['PERIPHERAL'] > 0 and bit.subsystem:
-                self.alert_percentage -= randrange(0, 4)
-                if self.alert_percentage <= 300 and self.alert_counter['PERIPHERAL'] == 4:
-                    self.alert_counter['PERIPHERAL'] -= 1
-                    self.peri_num += 1.0
-                elif self.alert_percentage == 0 and self.alert_counter['VENT NOT WORKING'] == 3:
-                    self.alert_counter['PERIPHERAL'] -= 1
-                    self.peri_num += 1.0
-                elif self.alert_percentage <= 100 and self.alert_counter['VENT NOT WORKING'] == 2:
-                    self.alert_counter['PERIPHERAL'] -= 1
-                    self.peri_num += 1.0
-                elif self.alert_percentage <= 0 and self.alert_counter['VENT NOT WORKING'] == 1:
-                    if self.alert_percentage < 0: self.alert_percentage = 0
-                    self.alert_counter['PERIPHERAL'] -= 1
-                    self.peri_num += 1.0
-                    self.alert = False
-                    bit.subsystem = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if self.functional:
+                    if self.alert_counter['PERIPHERAL'] > 0 and bit.FixCheck:
+                        self.alert_percentage -= randrange(0, 4)
+                        if self.alert_percentage <= 300 and self.alert_counter['PERIPHERAL'] == 4:
+                            self.alert_counter['PERIPHERAL'] -= 1
+                            self.peri_num += 1.0
+                        elif self.alert_percentage == 0 and self.alert_counter['VENT NOT WORKING'] == 3:
+                            self.alert_counter['PERIPHERAL'] -= 1
+                            self.peri_num += 1.0
+                        elif self.alert_percentage <= 100 and self.alert_counter['VENT NOT WORKING'] == 2:
+                            self.alert_counter['PERIPHERAL'] -= 1
+                            self.peri_num += 1.0
+                        elif self.alert_percentage <= 0 and self.alert_counter['VENT NOT WORKING'] == 1:
+                            if self.alert_percentage < 0: self.alert_percentage = 0
+                            self.alert_counter['PERIPHERAL'] -= 1
+                            self.peri_num += 1.0
+                            self.alert = False
+                            bit.FixCheck = False
+                else:
                     bit.FixCheck = False
-        else:
-            bit.subsystem = False
-            bit.FixCheck = False
             
     def tempIncrease(self):
         if model_CHIPSET.chipset_power > 0.0:
@@ -78,14 +78,10 @@ class ModelPERI:
         else: self.temperature = 10.0 * self.peri_num
             
     def powerManagement(self):
-        if self.power >= self.consumption * self.peri_num:
-            if not self.functional: self.functional = True
-            variable_consumption = (1.0 - (model_CHIPSET.chipset_power / 100))
-            if variable_consumption < 0: variable_consumption = 0
-            self.power -= (self.consumption * variable_consumption) * self.peri_num + self.consumption * self.peri_num
-            if self.power < 0: self.power = 0
-        else:
-            self.resetLocation()
+        variable_consumption = (1.0 - (model_CHIPSET.chipset_power / 100))
+        if variable_consumption < 0: variable_consumption = 0
+        self.power -= (self.consumption * variable_consumption) * self.peri_num + self.consumption * self.peri_num
+        if self.power < 0: self.power = 0
             
     def generateResource(self):
          if model_CHIPSET.chipset_power != 0:
@@ -120,4 +116,8 @@ class ModelPERI:
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        if loc_event == 3: self.powerManagement()
+        if self.power >= self.consumption * self.peri_num:
+            if not self.functional: self.functional = True
+            if loc_event == 10: self.powerManagement()
+        else:
+            if self.functional: self.resetLocation()

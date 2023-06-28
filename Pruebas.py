@@ -112,11 +112,13 @@ def loadBits(quantity, center, screen, view_locations):
 
 def drawBits(viewer_bits, model_bits):
     for bit in viewer_bits:
+        Fixing = False
         bit_collision = bit.checkBitCollision(pygame.mouse.get_pos())
-        if bit_collision:
-            for model_bit in model_bits:
-                if model_bit.name == bit.name: bit.showFont(model_bit.load)
-        bit.drawBit()
+        for model_bit in model_bits:
+            if model_bit.name == bit.name:
+                if bit_collision: bit.showFont(model_bit.load)
+                Fixing = model_bit.FixCheck
+        bit.drawBit(Fixing)
 
 
 def receiveOrderBits(viewer_bits, model_bits, ModelOrderBox):
@@ -138,6 +140,8 @@ def executeOrderBits(viewer_bits, model_bits, clock_event):
                 if bit.name == model_bit.name: bit.x = model_bit.x; bit.y = model_bit.y
         elif model_bit.MineCheck and clock_event:
             model_bit.mine(model_bit.loc)
+        elif model_bit.FixCheck and clock_event:
+            model_bit.fix(model_bit.loc)
 
 
 
@@ -265,7 +269,7 @@ def main():
         updateLocations(view_locations, model_locations, screen, clock_event, loc_event)
         executeOrderBits(viewer_bits, model_bits, clock_event)
         if clock_event: clock_event = False
-        if loc_event == 3: loc_event = 0
+        if loc_event == 10: loc_event = 0
         drawBits(viewer_bits, model_bits)
         if selection_on:
             selection.drawSelection(screen)

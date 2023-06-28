@@ -23,16 +23,16 @@ class ModelATX:
             self.alert_counter['STORED POWER'] -= 1
         ###
 
-    def customAlert(self, bit):
-        if bit.subsystem:
-            bit.subsystem = False
-            bit.FixCheck = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if bit.FixCheck: bit.FixCheck = False
 
     def powerManagement(self):
         if self.power > 4500: self.resetLocation()
 
     def generateResource(self):
-        self.power += round(uniform(10.0, 15.0), 2)
+        self.power += round(uniform(25.0, 50.0), 2)
 
     def getMined(self):
         self.generateResource()
@@ -40,7 +40,6 @@ class ModelATX:
     def getPower(self, name):  # Method for when a bit gives power to a location
         for bit in self.bit_list:
             if bit.name == name:
-                print('get')
                 charge = bit.load
                 self.power += charge
                 bit.load = 0
@@ -48,7 +47,6 @@ class ModelATX:
     def givePower(self, name):  # Method for when a bit gets power from a location
         for bit in self.bit_list:
             if bit.name == name:
-                print('give')
                 charge = bit.limit - bit.load
                 self.power -= charge
                 bit.load += charge

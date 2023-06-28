@@ -31,7 +31,7 @@ class ModelVENT:
         ###
         # Vent error
         if self.vent_num > 0:  # A vent error can happen only if there is at least 1 vent working
-            error = round(random(), 2)
+            error = random()
             if error > 0.95:  # 5% chance for the error to trigger
                 if not self.alert: self.alert = True
                 self.alert_counter['VENT'] += 1
@@ -51,29 +51,29 @@ class ModelVENT:
             self.alert_counter['POWER'] -= 1
         ###
             
-    def customAlert(self, bit):
-        if self.functional:
-            if self.alert_counter['VENT'] > 0 and bit.subsystem:
-                self.alert_percentage -= randrange(0, 4)
-                if self.alert_percentage <= 200 and self.alert_counter['VENT'] == 3:
-                    self.alert_counter['VENT'] -= 1
-                    self.vent_num += 1.0
-                elif self.alert_percentage <= 100 and self.alert_counter['VENT'] == 2:
-                    self.alert_counter['VENT'] -= 1
-                    self.vent_num += 1.0
-                elif self.alert_percentage <= 0 and self.alert_counter['VENT'] == 1:
-                    if self.alert_percentage < 0: self.alert_percentage = 0
-                    self.alert_counter['VENT'] -= 1
-                    self.vent_num += 1.0
-                    self.alert = False
-                    bit.subsystem = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if self.functional:
+                    if self.alert_counter['VENT'] > 0 and bit.FixCheck:
+                        self.alert_percentage -= randrange(0, 4)
+                        if self.alert_percentage <= 200 and self.alert_counter['VENT'] == 3:
+                            self.alert_counter['VENT'] -= 1
+                            self.vent_num += 1.0
+                        elif self.alert_percentage <= 100 and self.alert_counter['VENT'] == 2:
+                            self.alert_counter['VENT'] -= 1
+                            self.vent_num += 1.0
+                        elif self.alert_percentage <= 0 and self.alert_counter['VENT'] == 1:
+                            if self.alert_percentage < 0: self.alert_percentage = 0
+                            self.alert_counter['VENT'] -= 1
+                            self.vent_num += 1.0
+                            self.alert = False
+                            bit.subsystem = False
+                            bit.FixCheck = False
+                    elif self.alert_counter['VENT'] == 0 and bit.FixCheck:
+                        bit.FixCheck = False
+                else:
                     bit.FixCheck = False
-            elif self.alert_counter['VENT'] == 0 and bit.subsystem:
-                bit.subsystem = False
-                bit.FixCheck = False
-        else:
-            bit.subsystem = False
-            bit.FixCheck = False
 
     def tempIncrease(self):
         if self.rpm <= 2400.0:
@@ -81,14 +81,10 @@ class ModelVENT:
         else: self.temperature = -(self.consumption * (3.6 + self.rpm) + 30.0)
             
     def powerManagement(self):
-        if self.power >= self.consumption * self.vent_num:
-            if not self.functional: self.functional = True
-            variable_consumption = (self.rpm / 1000) - 2.4
-            if variable_consumption < 0: variable_consumption = 0
-            self.power -= self.consumption * variable_consumption + self.consumption * self.vent_num
-            if self.power < 0: self.power = 0
-        else:
-            self.resetLocation()
+        variable_consumption = (self.rpm / 1000) - 2.4
+        if variable_consumption < 0: variable_consumption = 0
+        self.power -= self.consumption * variable_consumption + self.consumption * self.vent_num
+        if self.power < 0: self.power = 0
             
     def generateResource(self):
         if self.rpm < 2400.0:
@@ -127,4 +123,8 @@ class ModelVENT:
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        if loc_event == 3: self.powerManagement()
+        if self.power >= self.consumption * self.vent_num:
+            if not self.functional: self.functional = True
+            if loc_event == 10: self.powerManagement()
+        else:
+            if self.functional: self.resetLocation()

@@ -42,22 +42,18 @@ class ModelCPU:
         elif self.power > 50 and self.alert_counter['power raw_power'] != 0:
             self.alert_counter['power raw_power'] -= 1
 
-    def customAlert(self, bit):
-        if bit.subsystem:
-            bit.subsystem = False
-            bit.FixCheck = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if bit.FixCheck: bit.FixCheck = False
 
     def tempIncrease(self):
         if self.processes <= 20.0 and self.temperature < 30.0: self.temperature += 1.0
         elif self.processes > 20.0: self.temperature = self.consumption * (1 * (self.processes / 100)) + 30
 
     def powerManagement(self):
-        if self.power >= self.consumption and self.temperature < 50.0:
-            if not self.functional: self.functional = True
-            self.power -= self.consumption
-            if self.power < 0: self.power = 0
-        else:
-            self.resetLocation()
+        self.power -= self.consumption
+        if self.power < 0: self.power = 0
 
     def generateResource(self):
         self.processes += randrange(1, 6)
@@ -92,4 +88,8 @@ class ModelCPU:
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        if loc_event == 3: self.powerManagement()
+        if self.power >= self.consumption and self.temperature < 50.0:
+            if not self.functional: self.functional = True
+            if loc_event == 10: self.powerManagement()
+        else:
+            if self.functional: self.resetLocation()

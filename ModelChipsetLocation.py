@@ -40,24 +40,20 @@ class ModelCHIPSET:
             self.alert_counter['POWER'] -= 1
         ###
 
-    def customAlert(self, bit):
-        if bit.subsystem:
-            bit.subsystem = False
-            bit.FixCheck = False
+    def customAlert(self, model_bit):
+        for bit in self.bit_list:
+            if bit.name == model_bit:
+                if bit.FixCheck: bit.FixCheck = False
 
     def tempIncrease(self):
         if self.chipset_power <= 40.0: self.temperature += 1.0
         else: self.temperature = self.consumption * ((self.chipset_power / 100.0) + 1.59) + 30.0
 
     def powerManagement(self):
-        if self.power >= self.consumption and self.temperature <= 65.0:
-            if not self.functional: self.functional = True
-            variable_consumption = (self.chipset_power / 100) - 1.5
-            if variable_consumption < 0: variable_consumption = 0
-            self.power -= self.consumption * variable_consumption + self.consumption
-            if self.power < 0: self.power = 0
-        else:
-            self.resetLocation()
+        variable_consumption = (self.chipset_power / 100) - 1.5
+        if variable_consumption < 0: variable_consumption = 0
+        self.power -= self.consumption * variable_consumption + self.consumption
+        if self.power < 0: self.power = 0
 
     def generateResource(self):
         self.chipset_power += round(uniform(0.0, 3.0), 2)
@@ -90,4 +86,8 @@ class ModelCHIPSET:
         if self.functional:
             self.manageAlerts()
             self.tempIncrease()
-        if loc_event == 3: self.powerManagement()
+        if self.power >= self.consumption and self.temperature <= 65.0:
+            if not self.functional: self.functional = True
+            if loc_event == 10: self.powerManagement()
+        else:
+            if self.functional: self.resetLocation()
