@@ -1,7 +1,3 @@
-import pygame
-from pygame.locals import *
-
-
 class ModelBit:
     """
     Model part class that controls each individual bit

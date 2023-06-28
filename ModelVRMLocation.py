@@ -1,5 +1,4 @@
 from random import *
-from ModelBit import ModelBit
 
 class ModelVRM:
     def __init__(self, name, x, y):
